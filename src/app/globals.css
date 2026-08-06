@@ -1,0 +1,48 @@
+/* Estilos base do protótipo — preservados sem alteração de identidade visual. */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #f4f2ed;
+}
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+a {
+  color: #c82a1e;
+  text-decoration: none;
+}
+a:hover {
+  color: #a6211a;
+  text-decoration: underline;
+}
+input,
+select,
+textarea,
+button {
+  font-family: "Archivo", system-ui, sans-serif;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #23405c;
+  outline-offset: 1px;
+}
+::placeholder {
+  color: #a9a399;
+}
+@keyframes rxspin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes rxpulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
