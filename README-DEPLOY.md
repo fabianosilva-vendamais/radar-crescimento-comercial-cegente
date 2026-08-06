@@ -87,7 +87,7 @@ Vercel → **novo** projeto do Radar → **Settings → Environment Variables �
 | `SMTP_USER` | seu e-mail completo `@vendamais.com.br` | não |
 | `SMTP_PASS` | a **senha de app** de 16 letras do Gmail | **sim** |
 | `EMAIL_FROM` | `VendaMais + Cegente <seu-email@vendamais.com.br>` | não |
-| `REPORT_BASE_URL` | a URL pública do site (ex.: `https://radar-crescimento-comercial.vercel.app`) | não |
+| `REPORT_BASE_URL` | a URL pública do site: `https://radar-crescimento-comercial-cegente.vercel.app` | não |
 
 Observações:
 - **Formato novo de chaves do Supabase:** o app já é compatível. Use a **chave
@@ -99,7 +99,17 @@ Observações:
 - Depois de cadastrar, faça **Redeploy** (a Vercel só aplica variáveis novas em
   um novo build).
 - `REPORT_BASE_URL` monta o link do relatório no e-mail: `{REPORT_BASE_URL}/r/{codigo}`.
-  Se não definir, o app usa a URL do próprio deploy da Vercel automaticamente.
+  Se não definir, o app usa a origem da própria requisição (o domínio que o
+  participante acessou) — mas o ideal é definir para garantir o link limpo.
+
+## Deixar o site público (Deployment Protection)
+
+Projetos novos da Vercel às vezes vêm com **Deployment Protection / Vercel
+Authentication** ligada — nesse caso, ao abrir o site aparece uma tela
+"Authentication Required" e o público não consegue acessar (respostas 401/403).
+Para o evento, desligue em **Settings → Deployment Protection** (ou libere a
+produção). Verifique também que a variável de ambiente e a `telao_stats()` estão
+OK abrindo `/api/telao` (deve devolver `{"total":0,"ready":false}`).
 
 ## Rodar localmente (opcional)
 
