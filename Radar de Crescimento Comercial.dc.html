@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#F4F2ED;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+a{color:#C82A1E;text-decoration:none;}a:hover{color:#A6211A;text-decoration:underline;}
+input,select,textarea,button{font-family:'Archivo',system-ui,sans-serif;}
+input:focus,select:focus,textarea:focus{outline:2px solid #23405C;outline-offset:1px;}
+::placeholder{color:#A9A399;}
+@keyframes rxspin{to{transform:rotate(360deg)}}
+@keyframes rxpulse{0%,100%{opacity:.4}50%{opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh;font-family:'Archivo',system-ui,sans-serif;color:#16181D;background:#F4F2ED;">
+
+<sc-if value="{{ sHome }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Tela inicial" style="max-width:540px;margin:0 auto;padding:28px 20px 40px;display:flex;flex-direction:column;gap:20px;">
+  <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;">
+    <div style="width:168px;height:52px;background:#fff;border:1px solid #E6E1D6;border-radius:10px;padding:5px;"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="rc-logo-vendamais" shape="rounded" radius="7" fit="contain" src="./logo-vendamais.jpg" placeholder="Logo VendaMais" hint-size="158px,42px"></x-import></div>
+    <div style="width:130px;height:52px;background:#fff;border:1px solid #E6E1D6;border-radius:10px;padding:5px;"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="rc-logo-cegente" shape="rounded" radius="7" fit="contain" src="./logo-cegente.png" placeholder="Logo Cegente" hint-size="120px,42px"></x-import></div>
+  </div>
+  <div style="text-align:center;display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+    <div style="font:700 12px Archivo;letter-spacing:.14em;color:#C82A1E;text-transform:uppercase;">VendaMais + Cegente · São José do Rio Preto</div>
+    <h1 style="margin:0;font:800 34px/1.12 Archivo;letter-spacing:-.01em;color:#16181D;">Radar de Crescimento Comercial</h1>
+    <p style="margin:0;font:400 17px/1.5 Archivo;color:#4C4F56;">Uma análise rápida para identificar os pontos que podem acelerar ou limitar o crescimento da sua empresa.</p>
+  </div>
+  <div style="background:#FFFFFF;border:1px solid #E6E1D6;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;">
+    <p style="margin:0;font:400 15px/1.55 Archivo;color:#33363C;">Antes de crescer mais, uma empresa precisa entender com clareza onde estão suas maiores oportunidades e gargalos comerciais. Este diagnóstico foi criado pela VendaMais para ajudar empresários e líderes comerciais a refletirem sobre estratégia, diferenciação, processo, equipe e execução.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;">
+      <span style="font:600 13px Archivo;color:#16181D;background:#EEEAE0;border-radius:999px;padding:6px 12px;">3 a 5 minutos</span>
+      <span style="font:600 13px Archivo;color:#16181D;background:#EEEAE0;border-radius:999px;padding:6px 12px;">15 perguntas</span>
+      <span style="font:600 13px Archivo;color:#16181D;background:#EEEAE0;border-radius:999px;padding:6px 12px;">Leitura imediata</span>
+    </div>
+  </div>
+  <sc-if value="{{ resumeAsk }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#FBF1EA;border:1px solid #E6C6A6;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font:600 15px Archivo;color:#7A4A18;">Encontramos um preenchimento em andamento neste aparelho. Deseja continuar de onde parou?</div>
+      <div style="display:flex;gap:10px;">
+        <button onClick="{{ onResume }}" style="flex:1;padding:12px;background:#C82A1E;color:#fff;border:none;border-radius:10px;font:600 15px Archivo;cursor:pointer;">Continuar</button>
+        <button onClick="{{ onDiscard }}" style="flex:1;padding:12px;background:#fff;color:#7A4A18;border:1px solid #E6C6A6;border-radius:10px;font:600 15px Archivo;cursor:pointer;">Começar de novo</button>
+      </div>
+    </div>
+  </sc-if>
+  <button onClick="{{ startFlow }}" style-hover="background:#A6211A" style="width:100%;padding:18px;background:#C82A1E;color:#fff;border:none;border-radius:14px;font:700 18px Archivo;cursor:pointer;box-shadow:0 6px 18px rgba(200,42,30,.26);">Iniciar diagnóstico</button>
+  <p style="margin:0;text-align:center;font:400 13px/1.5 Archivo;color:#6B6F76;">Não é uma prova, é um espelho. Responda conforme a realidade atual da sua empresa — quanto mais honestas as respostas, mais útil será a leitura.</p>
+  <div style="border-top:1px solid #E6E1D6;padding-top:16px;display:flex;justify-content:center;gap:18px;flex-wrap:wrap;">
+    <a href="#" onClick="{{ navReopen }}" style="font:600 13px Archivo;">Reabrir leitura</a>
+    <a href="#" onClick="{{ navLogin }}" style="font:600 13px Archivo;">Painel administrativo</a>
+    <a href="#" onClick="{{ navLive }}" style="font:600 13px Archivo;">Painel do evento</a>
+  </div>
+  <div style="text-align:center;font:400 11px Archivo;color:#B0AA9D;">Uma iniciativa VendaMais em parceria com Cegente · Protótipo com dados fictícios de demonstração.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sIdent }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Identificação" style="max-width:540px;margin:0 auto;padding:24px 20px 48px;display:flex;flex-direction:column;gap:18px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <button onClick="{{ navHome }}" style="background:none;border:none;font:600 15px Archivo;color:#C82A1E;cursor:pointer;padding:8px 0;">‹ Voltar</button>
+    <span style="font:600 12px Archivo;letter-spacing:.1em;color:#8A857A;text-transform:uppercase;">Etapa 1 de 3</span>
+  </div>
+  <div>
+    <h2 style="margin:0 0 6px;font:800 26px Archivo;color:#16181D;">Sobre você</h2>
+    <p style="margin:0;font:400 15px/1.5 Archivo;color:#4C4F56;">Usamos esses dados para gerar sua leitura e, se você desejar, enviar a devolutiva consultiva.</p>
+  </div>
+  <sc-for list="{{ idFields }}" as="f" hint-placeholder-count="6">
+    <label style="display:flex;flex-direction:column;gap:6px;">
+      <span style="font:600 14px Archivo;color:#33363C;">{{ f.label }}</span>
+      <input type="{{ f.type }}" value="{{ f.value }}" onChange="{{ f.on }}" placeholder="{{ f.ph }}" style="padding:14px;border:1px solid #D8D2C4;border-radius:12px;font:400 16px Archivo;background:#fff;color:#16181D;" />
+    </label>
+  </sc-for>
+  <div style="display:flex;gap:12px;">
+    <label style="flex:1;display:flex;flex-direction:column;gap:6px;">
+      <span style="font:600 14px Archivo;color:#33363C;">Cidade *</span>
+      <input value="{{ cidadeVal }}" onChange="{{ onCidade }}" placeholder="Sua cidade" style="padding:14px;border:1px solid #D8D2C4;border-radius:12px;font:400 16px Archivo;background:#fff;color:#16181D;" />
+    </label>
+    <label style="width:120px;display:flex;flex-direction:column;gap:6px;">
+      <span style="font:600 14px Archivo;color:#33363C;">Estado *</span>
+      <select value="{{ ufVal }}" onChange="{{ onUf }}" style="padding:14px;border:1px solid #D8D2C4;border-radius:12px;font:400 16px Archivo;background:#fff;color:#16181D;">
+        <sc-for list="{{ ufOpts }}" as="u" hint-placeholder-count="3"><option value="{{ u }}">{{ u }}</option></sc-for>
+      </select>
+    </label>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span style="font:600 14px Archivo;color:#33363C;">Cargo ou função *</span>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <sc-for list="{{ cargoChips }}" as="c" hint-placeholder-count="4">
+        <button onClick="{{ c.on }}" style="padding:11px 14px;border-radius:999px;font:600 14px Archivo;cursor:pointer;border:1px solid {{ c.bc }};background:{{ c.bg }};color:{{ c.fg }};">{{ c.t }}</button>
+      </sc-for>
+    </div>
+  </div>
+  <sc-if value="{{ errId }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#FBEDEC;border:1px solid #E4B4B1;border-radius:12px;padding:12px 14px;font:600 14px Archivo;color:#9A2B26;">{{ errId }}</div>
+  </sc-if>
+  <button onClick="{{ onIdentNext }}" style-hover="background:#A6211A" style="width:100%;padding:16px;background:#C82A1E;color:#fff;border:none;border-radius:14px;font:700 17px Archivo;cursor:pointer;">Continuar</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sProfile }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Perfil da empresa" style="max-width:540px;margin:0 auto;padding:24px 20px 48px;display:flex;flex-direction:column;gap:20px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <button onClick="{{ onProfBack }}" style="background:none;border:none;font:600 15px Archivo;color:#C82A1E;cursor:pointer;padding:8px 0;">‹ Voltar</button>
+    <span style="font:600 12px Archivo;letter-spacing:.1em;color:#8A857A;text-transform:uppercase;">Etapa 2 de 3</span>
+  </div>
+  <div>
+    <h2 style="margin:0 0 6px;font:800 26px Archivo;color:#16181D;">Sobre a empresa</h2>
+    <p style="margin:0;font:400 15px/1.5 Archivo;color:#4C4F56;">Essas informações contextualizam sua leitura — elas não alteram sua pontuação.</p>
+  </div>
+  <sc-for list="{{ profGroups }}" as="g" hint-placeholder-count="4">
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <span style="font:600 14px Archivo;color:#33363C;">{{ g.title }}</span>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="4">
+          <button onClick="{{ c.on }}" style="padding:11px 14px;border-radius:999px;font:600 14px Archivo;cursor:pointer;border:1px solid {{ c.bc }};background:{{ c.bg }};color:{{ c.fg }};">{{ c.t }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+  <button onClick="{{ onConsent }}" style="display:flex;gap:12px;align-items:flex-start;text-align:left;padding:14px;border-radius:12px;cursor:pointer;border:1px solid {{ consentBc }};background:{{ consentBg }};">
+    <span style="flex:none;width:24px;height:24px;border-radius:7px;border:2px solid {{ consentBc }};background:{{ consentBoxBg }};color:#fff;font:700 15px/20px Archivo;text-align:center;">{{ consentMark }}</span>
+    <span style="font:400 13px/1.45 Archivo;color:#33363C;">Ao enviar minhas respostas, autorizo a VendaMais e a Cegente a utilizarem as informações para fins de análise, relacionamento e envio de comunicações relacionadas ao evento, conteúdos e possíveis conversas consultivas. Meus dados não serão vendidos a terceiros. *</span>
+  </button>
+  <sc-if value="{{ errProf }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#FBEDEC;border:1px solid #E4B4B1;border-radius:12px;padding:12px 14px;font:600 14px Archivo;color:#9A2B26;">{{ errProf }}</div>
+  </sc-if>
+  <button onClick="{{ onProfNext }}" style-hover="background:#A6211A" style="width:100%;padding:16px;background:#C82A1E;color:#fff;border:none;border-radius:14px;font:700 17px Archivo;cursor:pointer;">Continuar</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sScale }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Escala de respostas" style="max-width:540px;margin:0 auto;padding:24px 20px 48px;display:flex;flex-direction:column;gap:18px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <button onClick="{{ onScaleBack }}" style="background:none;border:none;font:600 15px Archivo;color:#C82A1E;cursor:pointer;padding:8px 0;">‹ Voltar</button>
+    <span style="font:600 12px Archivo;letter-spacing:.1em;color:#8A857A;text-transform:uppercase;">Etapa 3 de 3</span>
+  </div>
+  <div>
+    <h2 style="margin:0 0 6px;font:800 26px Archivo;color:#16181D;">Como responder</h2>
+    <p style="margin:0;font:400 15px/1.5 Archivo;color:#4C4F56;">A maioria das perguntas usa uma escala de concordância. Escolha o quanto cada afirmação representa a realidade da sua empresa hoje.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <sc-for list="{{ scaleList }}" as="s" hint-placeholder-count="5">
+      <div style="display:flex;gap:14px;align-items:center;background:#fff;border:1px solid #E6E1D6;border-radius:14px;padding:14px;">
+        <span style="flex:none;width:34px;height:34px;border-radius:10px;background:#EEEAE0;color:#23405C;font:800 16px/34px Archivo;text-align:center;">{{ s.v }}</span>
+        <strong style="font:700 15px Archivo;color:#16181D;">{{ s.t }}</strong>
+      </div>
+    </sc-for>
+  </div>
+  <button onClick="{{ onScaleNext }}" style-hover="background:#A6211A" style="width:100%;padding:16px;background:#C82A1E;color:#fff;border:none;border-radius:14px;font:700 17px Archivo;cursor:pointer;">Começar o diagnóstico</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sQuiz }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Questionário" style="max-width:540px;margin:0 auto;padding:16px 20px 48px;display:flex;flex-direction:column;gap:16px;">
+  <div style="position:sticky;top:0;background:#F4F2ED;padding:8px 0 10px;z-index:5;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <button onClick="{{ onQBack }}" style="background:none;border:none;font:600 14px Archivo;color:#C82A1E;cursor:pointer;padding:6px 0;">‹ Voltar</button>
+      <span style="font:600 13px Archivo;color:#6B6F76;">{{ qNum }} de 18</span>
+    </div>
+    <div style="height:6px;background:#E4DFD3;border-radius:999px;overflow:hidden;">
+      <div style="height:6px;background:#C82A1E;border-radius:999px;transition:width .25s;width:{{ progressPct }}%;"></div>
+    </div>
+  </div>
+  <div style="font:700 12px Archivo;letter-spacing:.12em;color:#C82A1E;text-transform:uppercase;">{{ qDim }}</div>
+  <h2 style="margin:0;font:800 22px/1.32 Archivo;color:#16181D;">{{ qText }}</h2>
+  <sc-if value="{{ qScale }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <sc-for list="{{ qOpts }}" as="o" hint-placeholder-count="5">
+        <button onClick="{{ o.on }}" style="display:flex;gap:12px;align-items:center;text-align:left;padding:14px;border-radius:13px;cursor:pointer;border:2px solid {{ o.bc }};background:{{ o.bg }};min-height:56px;">
+          <span style="flex:none;width:30px;height:30px;border-radius:9px;background:{{ o.nbg }};color:{{ o.nfg }};font:800 15px/30px Archivo;text-align:center;">{{ o.v }}</span>
+          <strong style="font:700 15px Archivo;color:#16181D;">{{ o.t }}</strong>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{ qSingle }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <sc-for list="{{ qSingleOpts }}" as="o" hint-placeholder-count="5">
+        <button onClick="{{ o.on }}" style="text-align:left;padding:14px;border-radius:13px;cursor:pointer;border:2px solid {{ o.bc }};background:{{ o.bg }};font:600 15px Archivo;color:#16181D;min-height:52px;">{{ o.t }}</button>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{ qOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <textarea value="{{ qOpenVal }}" onChange="{{ onQOpen }}" rows="4" placeholder="Escreva com suas palavras (opcional)" style="padding:14px;border:1px solid #D8D2C4;border-radius:12px;font:400 16px Archivo;background:#fff;color:#16181D;resize:vertical;"></textarea>
+    </div>
+  </sc-if>
+  <sc-if value="{{ qShowNext }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ onQNext }}" style-hover="background:#A6211A" style="width:100%;padding:15px;background:#C82A1E;color:#fff;border:none;border-radius:13px;font:700 16px Archivo;cursor:pointer;">{{ qNextLabel }}</button>
+  </sc-if>
+  <div style="text-align:center;font:400 12px Archivo;color:#B0AA9D;">Suas respostas ficam salvas automaticamente neste aparelho.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sProc }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Processando" style="max-width:540px;margin:0 auto;padding:100px 24px;display:flex;flex-direction:column;gap:22px;align-items:center;text-align:center;">
+  <div style="width:54px;height:54px;border-radius:50%;border:5px solid #E4DFD3;border-top-color:#C82A1E;animation:rxspin .9s linear infinite;"></div>
+  <h2 style="margin:0;font:800 24px Archivo;color:#16181D;">Gerando sua leitura</h2>
+  <p style="margin:0;font:400 16px/1.55 Archivo;color:#4C4F56;animation:rxpulse 2s ease infinite;">Estamos organizando suas respostas e identificando onde sua empresa está mais forte e onde pode haver gargalos.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{ sResult }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Resultado" style="max-width:620px;margin:0 auto;padding:24px 20px 56px;display:flex;flex-direction:column;gap:18px;">
+  <sc-if value="{{ rBackLabel }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ onRBack }}" style="align-self:flex-start;background:none;border:none;font:600 15px Archivo;color:#C82A1E;cursor:pointer;padding:6px 0;">‹ {{ rBackLabel }}</button>
+  </sc-if>
+  <sc-if value="{{ rDemoBadge }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#EDEFF4;border:1px solid #BFC9DA;border-radius:10px;padding:10px 14px;font:600 13px Archivo;color:#334A66;">Exemplo com dados de demonstração</div>
+  </sc-if>
+  <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;">
+    <div>
+      <div style="font:700 12px Archivo;letter-spacing:.12em;color:#C82A1E;text-transform:uppercase;">Radar de Crescimento Comercial</div>
+      <h2 style="margin:4px 0 2px;font:800 24px Archivo;color:#16181D;">{{ rNome }}</h2>
+      <div style="font:400 14px Archivo;color:#6B6F76;">{{ rEmpresa }} · {{ rLocal }}</div>
+    </div>
+    <div style="text-align:right;font:400 12px/1.5 Archivo;color:#8A857A;">{{ rDate }}<br />Leitura {{ rCode }}</div>
+  </div>
+  <div style="background:#16181D;border-radius:20px;padding:26px 22px;color:#fff;display:flex;flex-direction:column;gap:12px;">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+      <span style="font:800 60px/1 Archivo;letter-spacing:-.02em;">{{ rScore }}</span>
+      <span style="font:400 15px Archivo;color:#B9BDC6;">de 75 pontos</span>
+    </div>
+    <div style="font:800 22px Archivo;color:#E8A44A;">{{ rClsName }}</div>
+    <p style="margin:0;font:400 15px/1.55 Archivo;color:#C9CCD3;">{{ rClsDesc }}</p>
+    <p style="margin:0;font:600 15px/1.55 Archivo;color:#fff;border-left:3px solid #C82A1E;padding-left:12px;">{{ rClsMsg }}</p>
+  </div>
+  <sc-if value="{{ rShowStatus }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;border:1px solid #E6E1D6;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;">
+      <div style="font:600 14px Archivo;color:{{ rSaveFg }};">{{ rSaveLine }}</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="font:600 14px Archivo;color:{{ rMailFg }};">{{ rMailLine }}</span>
+        <sc-if value="{{ rShowResend }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ onResend }}" style="padding:8px 14px;background:#EEEAE0;color:#C82A1E;border:none;border-radius:999px;font:600 13px Archivo;cursor:pointer;">Reenviar por e-mail</button>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+  <div style="background:#fff;border:1px solid #E6E1D6;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:6px;align-items:center;">
+    <div style="align-self:flex-start;font:700 13px Archivo;letter-spacing:.08em;text-transform:uppercase;color:#8A857A;">Radar das cinco dimensões</div>
+    <div style="position:relative;width:100%;max-width:400px;">
+      <svg viewBox="0 0 380 330" style="width:100%;display:block;">
+        <sc-for list="{{ radarRings }}" as="rg"><polygon points="{{ rg }}" style="fill:none;stroke:#E4DFD3;stroke-width:1;"></polygon></sc-for>
+        <sc-for list="{{ radarAxes }}" as="ax"><line x1="190" y1="160" x2="{{ ax.x }}" y2="{{ ax.y }}" style="stroke:#E4DFD3;stroke-width:1;"></line></sc-for>
+        <polygon points="{{ radarPoly }}" style="fill:rgba(200,42,30,.14);stroke:#C82A1E;stroke-width:2.5;stroke-linejoin:round;"></polygon>
+        <sc-for list="{{ radarDots }}" as="d"><circle cx="{{ d.x }}" cy="{{ d.y }}" r="4" style="fill:#C82A1E;"></circle></sc-for>
+      </svg>
+      <sc-for list="{{ radarLabels }}" as="lb">
+        <div style="position:absolute;left:{{ lb.lx }}%;top:{{ lb.ty }}%;transform:translate({{ lb.tx }},-50%);text-align:{{ lb.ta }};white-space:nowrap;">
+          <div style="font:600 12px Archivo;color:#5A554B;">{{ lb.t }}</div>
+          <div style="font:800 14px Archivo;color:#16181D;">{{ lb.s }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="width:100%;display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+      <sc-for list="{{ rBars }}" as="b" hint-placeholder-count="5">
+        <div>
+          <div style="display:flex;justify-content:space-between;gap:8px;font:600 13px Archivo;color:#33363C;margin-bottom:4px;"><span>{{ b.name }}</span><span style="white-space:nowrap;color:{{ b.fg }};">{{ b.txt }}</span></div>
+          <div style="height:8px;background:#EFEAE0;border-radius:999px;overflow:hidden;"><div style="height:8px;border-radius:999px;background:{{ b.color }};width:{{ b.pct }}%;"></div></div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="background:#fff;border:1px solid #E6E1D6;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px;">
+    <div style="font:700 13px Archivo;letter-spacing:.08em;text-transform:uppercase;color:#1E7F4F;">Onde você está mais forte</div>
+    <div style="font:700 16px Archivo;color:#16181D;">{{ rStrongName }} <span style="color:#1E7F4F;">— {{ rStrongScore }}/15</span></div>
+    <p style="margin:0;font:400 14px/1.5 Archivo;color:#4C4F56;">{{ rStrongTxt }}</p>
+  </div>
+  <div style="background:#FBF1EA;border:1px solid #E6C6A6;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px;">
+    <div style="font:700 13px Archivo;letter-spacing:.08em;text-transform:uppercase;color:#C82A1E;">Principal ponto de atenção: {{ rGapName }}</div>
+    <p style="margin:0;font:600 16px/1.5 Archivo;color:#16181D;">{{ rGapTxt }}</p>
+  </div>
+  <div style="background:#23405C;border-radius:20px;padding:22px;color:#fff;display:flex;flex-direction:column;gap:8px;">
+    <div style="font:700 13px Archivo;letter-spacing:.08em;text-transform:uppercase;color:#9FC0E0;">Próximo passo</div>
+    <p style="margin:0;font:400 15px/1.55 Archivo;color:#D6E1EC;">{{ rNextStep }}</p>
+  </div>
+  <div style="border-top:1px solid #E6E1D6;padding-top:16px;text-align:center;display:flex;flex-direction:column;gap:8px;">
+    <div style="font:400 13px Archivo;color:#6B6F76;">Guarde o código <strong style="font-family:ui-monospace,monospace;color:#16181D;">{{ rCode }}</strong> para reabrir esta leitura.</div>
+    <a href="#" onClick="{{ navHomeFromResult }}" style="font:600 14px Archivo;">Voltar ao início</a>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sReopen }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Reabrir leitura" style="max-width:460px;margin:0 auto;padding:40px 20px;display:flex;flex-direction:column;gap:16px;">
+  <button onClick="{{ navHome }}" style="align-self:flex-start;background:none;border:none;font:600 15px Archivo;color:#C82A1E;cursor:pointer;padding:6px 0;">‹ Voltar</button>
+  <h2 style="margin:0;font:800 26px Archivo;color:#16181D;">Reabrir leitura</h2>
+  <p style="margin:0;font:400 15px/1.5 Archivo;color:#4C4F56;">Digite o código que você recebeu na tela de resultado e no e-mail.</p>
+  <input value="{{ reopenVal }}" onChange="{{ onReopenChange }}" placeholder="Ex.: RC-DEMO-02" style="padding:16px;border:1px solid #D8D2C4;border-radius:12px;font:600 17px ui-monospace,monospace;background:#fff;color:#16181D;text-transform:uppercase;" />
+  <sc-if value="{{ reopenErr }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#FBEDEC;border:1px solid #E4B4B1;border-radius:12px;padding:12px 14px;font:600 14px Archivo;color:#9A2B26;">{{ reopenErr }}</div>
+  </sc-if>
+  <button onClick="{{ onReopenGo }}" style-hover="background:#A6211A" style="padding:16px;background:#C82A1E;color:#fff;border:none;border-radius:12px;font:700 16px Archivo;cursor:pointer;">Abrir leitura</button>
+  <p style="margin:0;font:400 12px/1.5 Archivo;color:#9B968B;">Protótipo: experimente o código <strong>RC-DEMO-02</strong>.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{ sLogin }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Login administrativo" style="max-width:420px;margin:0 auto;padding:60px 20px;display:flex;flex-direction:column;gap:16px;">
+  <button onClick="{{ navHome }}" style="align-self:flex-start;background:none;border:none;font:600 15px Archivo;color:#C82A1E;cursor:pointer;padding:6px 0;">‹ Voltar</button>
+  <div style="font:700 12px Archivo;letter-spacing:.12em;color:#C82A1E;text-transform:uppercase;">Acesso restrito · VendaMais</div>
+  <h2 style="margin:0;font:800 26px Archivo;color:#16181D;">Painel administrativo</h2>
+  <input type="password" value="{{ pwVal }}" onChange="{{ onPwChange }}" placeholder="Senha de acesso" style="padding:16px;border:1px solid #D8D2C4;border-radius:12px;font:400 16px Archivo;background:#fff;color:#16181D;" />
+  <sc-if value="{{ pwErr }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#FBEDEC;border:1px solid #E4B4B1;border-radius:12px;padding:12px 14px;font:600 14px Archivo;color:#9A2B26;">{{ pwErr }}</div>
+  </sc-if>
+  <button onClick="{{ onPwGo }}" style-hover="background:#A6211A" style="padding:16px;background:#C82A1E;color:#fff;border:none;border-radius:12px;font:700 16px Archivo;cursor:pointer;">Entrar</button>
+  <p style="margin:0;font:400 12px/1.5 Archivo;color:#9B968B;">Protótipo: use a senha <strong>demo2026</strong>. Na produção, o acesso terá autenticação segura.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{ sAdmin }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Painel administrativo" style="min-height:100vh;background:#EDEAE2;">
+  <div style="background:#16181D;color:#fff;padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div><div style="font:700 11px Archivo;letter-spacing:.12em;color:#E8A44A;text-transform:uppercase;">VendaMais + Cegente</div><div style="font:800 17px Archivo;">Radar — Painel administrativo</div></div>
+    <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+      <sc-for list="{{ admTabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.on }}" style="padding:9px 14px;border-radius:999px;font:600 13px Archivo;cursor:pointer;border:1px solid {{ t.bc }};background:{{ t.bg }};color:{{ t.fg }};">{{ t.t }}</button>
+      </sc-for>
+      <button onClick="{{ onOpenLive }}" style="padding:9px 14px;border-radius:999px;font:600 13px Archivo;cursor:pointer;border:1px solid #3A3E47;background:transparent;color:#C9CCD3;">Telão ↗</button>
+      <button onClick="{{ onLogout }}" style="padding:9px 14px;border-radius:999px;font:600 13px Archivo;cursor:pointer;border:1px solid #3A3E47;background:transparent;color:#C9CCD3;">Sair</button>
+    </div>
+  </div>
+  <div style="max-width:1180px;margin:0 auto;padding:18px 20px 60px;display:flex;flex-direction:column;gap:16px;">
+    <sc-if value="{{ admDemoBanner }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#EDEFF4;border:1px solid #BFC9DA;border-radius:10px;padding:10px 14px;font:600 13px Archivo;color:#334A66;">Dados de demonstração — participantes fictícios para validar o painel. Desative em Tweaks para ver os estados vazios.</div>
+    </sc-if>
+    <sc-if value="{{ tabGeral }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+        <sc-for list="{{ admStats }}" as="s" hint-placeholder-count="6">
+          <div style="background:#fff;border:1px solid #E6E1D6;border-radius:14px;padding:14px;">
+            <div style="font:800 26px Archivo;color:#16181D;">{{ s.n }}</div>
+            <div style="font:600 12px/1.35 Archivo;color:#6B6F76;">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;">
+        <div style="background:#fff;border:1px solid #E6E1D6;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font:700 13px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;">Média por dimensão (de 15) · geral: <span style="color:#C82A1E;font-size:16px;">{{ admAvg }}</span>/75</div>
+          <sc-for list="{{ admDims }}" as="d" hint-placeholder-count="5">
+            <div>
+              <div style="display:flex;justify-content:space-between;font:600 13px Archivo;color:#33363C;margin-bottom:3px;"><span>{{ d.name }}</span><span>{{ d.score }}</span></div>
+              <div style="height:7px;background:#EFEAE0;border-radius:999px;overflow:hidden;"><div style="height:7px;background:#C82A1E;border-radius:999px;width:{{ d.pct }}%;"></div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #E6E1D6;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font:700 13px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;">Distribuição por estágio</div>
+          <sc-for list="{{ admStages }}" as="d" hint-placeholder-count="4">
+            <div>
+              <div style="display:flex;justify-content:space-between;font:600 13px Archivo;color:#33363C;margin-bottom:3px;"><span>{{ d.name }}</span><span>{{ d.n }}</span></div>
+              <div style="height:7px;background:#EFEAE0;border-radius:999px;overflow:hidden;"><div style="height:7px;background:#16181D;border-radius:999px;width:{{ d.pct }}%;"></div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #E6E1D6;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font:700 13px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;">Prioridade comercial (lead)</div>
+          <sc-for list="{{ admLead }}" as="d" hint-placeholder-count="3">
+            <div>
+              <div style="display:flex;justify-content:space-between;font:600 13px Archivo;color:#33363C;margin-bottom:3px;"><span>{{ d.name }}</span><span>{{ d.n }}</span></div>
+              <div style="height:7px;background:#EFEAE0;border-radius:999px;overflow:hidden;"><div style="height:7px;background:{{ d.color }};border-radius:999px;width:{{ d.pct }}%;"></div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #E6E1D6;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font:700 13px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;">Principal gargalo do grupo</div>
+          <sc-for list="{{ admGap }}" as="d" hint-placeholder-count="5">
+            <div>
+              <div style="display:flex;justify-content:space-between;font:600 13px Archivo;color:#33363C;margin-bottom:3px;"><span>{{ d.name }}</span><span>{{ d.n }}</span></div>
+              <div style="height:7px;background:#EFEAE0;border-radius:999px;overflow:hidden;"><div style="height:7px;background:#9A2B26;border-radius:999px;width:{{ d.pct }}%;"></div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #E6E1D6;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font:700 13px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;">Segmentos</div>
+          <sc-for list="{{ admSeg }}" as="d" hint-placeholder-count="5">
+            <div>
+              <div style="display:flex;justify-content:space-between;font:600 13px Archivo;color:#33363C;margin-bottom:3px;"><span>{{ d.name }}</span><span>{{ d.n }}</span></div>
+              <div style="height:7px;background:#EFEAE0;border-radius:999px;overflow:hidden;"><div style="height:7px;background:#23405C;border-radius:999px;width:{{ d.pct }}%;"></div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #E6E1D6;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font:700 13px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;">Temas mais desejados</div>
+          <sc-for list="{{ admTema }}" as="d" hint-placeholder-count="6">
+            <div>
+              <div style="display:flex;justify-content:space-between;font:600 13px Archivo;color:#33363C;margin-bottom:3px;"><span>{{ d.name }}</span><span>{{ d.n }}</span></div>
+              <div style="height:7px;background:#EFEAE0;border-radius:999px;overflow:hidden;"><div style="height:7px;background:#B4841E;border-radius:999px;width:{{ d.pct }}%;"></div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ tabPart }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <sc-for list="{{ admFilters }}" as="f" hint-placeholder-count="4">
+          <label style="display:flex;flex-direction:column;gap:3px;">
+            <span style="font:600 11px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;">{{ f.label }}</span>
+            <select value="{{ f.value }}" onChange="{{ f.on }}" style="padding:8px 10px;border:1px solid #D8D2C4;border-radius:9px;font:600 13px Archivo;background:#fff;color:#16181D;max-width:180px;">
+              <sc-for list="{{ f.opts }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
+            </select>
+          </label>
+        </sc-for>
+      </div>
+      <div style="font:600 13px Archivo;color:#6B6F76;">{{ admRowCount }}</div>
+      <sc-if value="{{ admEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px dashed #D8D2C4;border-radius:16px;padding:40px;text-align:center;font:600 15px Archivo;color:#8A857A;">Nenhum participante encontrado com os filtros atuais.</div>
+      </sc-if>
+      <div style="overflow-x:auto;background:#fff;border:1px solid #E6E1D6;border-radius:16px;">
+        <table style="border-collapse:collapse;width:100%;min-width:1240px;font:400 13px Archivo;">
+          <thead><tr>
+            <sc-for list="{{ admCols }}" as="c"><th style="text-align:left;padding:12px 10px;font:700 11px Archivo;letter-spacing:.05em;text-transform:uppercase;color:#8A857A;border-bottom:1px solid #E6E1D6;white-space:nowrap;">{{ c }}</th></sc-for>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ admRows }}" as="r" hint-placeholder-count="6">
+              <tr onClick="{{ r.onOpen }}" style="cursor:pointer;" style-hover="background:#FAF7F1">
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;font-weight:700;color:#16181D;white-space:nowrap;">{{ r.nome }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;">{{ r.empresa }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;">{{ r.cargo }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;">{{ r.local }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;">{{ r.segmento }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;">{{ r.fat }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;font-weight:800;color:#C82A1E;">{{ r.nota }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;">{{ r.estagio }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;">{{ r.gargalo }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;">{{ r.interesse }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;">{{ r.tema }}</td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;"><span style="font:700 11px Archivo;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:4px 9px;background:{{ r.mailBg }};color:{{ r.mailFg }};">{{ r.mail }}</span></td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;"><span style="font:800 11px Archivo;border-radius:7px;padding:4px 8px;background:{{ r.leadBg }};color:{{ r.leadFg }};">{{ r.lead }}</span></td>
+                <td style="padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;color:#6B6F76;">{{ r.data }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </sc-if>
+    <sc-if value="{{ tabMail }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px solid #E6E1D6;border-radius:16px;overflow-x:auto;">
+        <table style="border-collapse:collapse;width:100%;min-width:760px;font:400 13px Archivo;">
+          <thead><tr>
+            <th style="text-align:left;padding:12px;font:700 11px Archivo;letter-spacing:.05em;text-transform:uppercase;color:#8A857A;border-bottom:1px solid #E6E1D6;">Destinatário</th>
+            <th style="text-align:left;padding:12px;font:700 11px Archivo;letter-spacing:.05em;text-transform:uppercase;color:#8A857A;border-bottom:1px solid #E6E1D6;">Status</th>
+            <th style="text-align:left;padding:12px;font:700 11px Archivo;letter-spacing:.05em;text-transform:uppercase;color:#8A857A;border-bottom:1px solid #E6E1D6;">Tentativas</th>
+            <th style="text-align:left;padding:12px;font:700 11px Archivo;letter-spacing:.05em;text-transform:uppercase;color:#8A857A;border-bottom:1px solid #E6E1D6;">Último envio</th>
+            <th style="text-align:left;padding:12px;font:700 11px Archivo;letter-spacing:.05em;text-transform:uppercase;color:#8A857A;border-bottom:1px solid #E6E1D6;">Último erro</th>
+            <th style="text-align:left;padding:12px;font:700 11px Archivo;letter-spacing:.05em;text-transform:uppercase;color:#8A857A;border-bottom:1px solid #E6E1D6;">Ação</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ admMailRows }}" as="m" hint-placeholder-count="6">
+              <tr>
+                <td style="padding:11px 12px;border-bottom:1px solid #F0EBE0;"><strong>{{ m.nome }}</strong><br /><span style="color:#6B6F76;">{{ m.email }}</span></td>
+                <td style="padding:11px 12px;border-bottom:1px solid #F0EBE0;"><span style="font:700 11px Archivo;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:4px 9px;background:{{ m.bg }};color:{{ m.fg }};">{{ m.status }}</span></td>
+                <td style="padding:11px 12px;border-bottom:1px solid #F0EBE0;">{{ m.tries }}</td>
+                <td style="padding:11px 12px;border-bottom:1px solid #F0EBE0;color:#6B6F76;">{{ m.date }}</td>
+                <td style="padding:11px 12px;border-bottom:1px solid #F0EBE0;color:#9A2B26;">{{ m.err }}</td>
+                <td style="padding:11px 12px;border-bottom:1px solid #F0EBE0;"><button onClick="{{ m.onResend }}" style="padding:7px 12px;background:#EEEAE0;color:#C82A1E;border:none;border-radius:999px;font:600 12px Archivo;cursor:pointer;">Reenviar</button></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </sc-if>
+    <sc-if value="{{ tabExport }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+        <div style="background:#fff;border:1px solid #E6E1D6;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;">
+          <strong style="font:700 16px Archivo;color:#16181D;">Participantes e resultados</strong>
+          <span style="font:400 13px/1.5 Archivo;color:#6B6F76;">Perfil completo, respostas P1–P15, obstáculo, tema, interesse, score total, por dimensão, gargalo e prioridade comercial.</span>
+          <button onClick="{{ onExportFull }}" style-hover="background:#A6211A" style="padding:13px;background:#C82A1E;color:#fff;border:none;border-radius:11px;font:700 14px Archivo;cursor:pointer;">Exportar CSV</button>
+        </div>
+        <div style="background:#fff;border:1px solid #E6E1D6;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;">
+          <strong style="font:700 16px Archivo;color:#16181D;">Somente leads para follow-up</strong>
+          <span style="font:400 13px/1.5 Archivo;color:#6B6F76;">Contato, cargo, empresa, WhatsApp, prioridade, gargalo e tema — pronto para a equipe comercial.</span>
+          <button onClick="{{ onExportLeads }}" style-hover="background:#A6211A" style="padding:13px;background:#C82A1E;color:#fff;border:none;border-radius:11px;font:700 14px Archivo;cursor:pointer;">Exportar CSV</button>
+        </div>
+      </div>
+      <div style="font:400 12px/1.5 Archivo;color:#9B968B;">Os arquivos abrem no Excel (separador ponto e vírgula, UTF-8). Origem registrada: Evento VendaMais + Cegente.</div>
+    </sc-if>
+  </div>
+  <sc-if value="{{ admSelOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(20,22,26,.5);z-index:40;" onClick="{{ onSelClose }}"></div>
+    <div style="position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);background:#F7F5EF;z-index:41;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:-12px 0 40px rgba(0,0,0,.2);">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong style="font:800 18px Archivo;color:#16181D;">{{ selNome }}</strong>
+        <button onClick="{{ onSelClose }}" style="background:none;border:none;font:700 22px Archivo;color:#6B6F76;cursor:pointer;padding:4px 8px;">×</button>
+      </div>
+      <div style="font:400 14px/1.6 Archivo;color:#4C4F56;">{{ selEmpresa }} · {{ selLocal }}<br />{{ selCargo }} · {{ selSeg }}<br />{{ selVend }} · {{ selUnid }} · {{ selFat }}<br />{{ selEmail }}<sc-if value="{{ selWhats }}" hint-placeholder-val="{{ false }}"><br />WhatsApp: {{ selWhats }}</sc-if></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span style="font:700 13px/1.4 Archivo;background:#16181D;color:#fff;border-radius:10px;padding:6px 12px;">{{ selNota }}/75 · {{ selEstagio }}</span>
+        <span style="font:700 13px/1.4 Archivo;background:{{ selLeadBg }};color:{{ selLeadFg }};border-radius:10px;padding:6px 12px;">Lead {{ selLead }}</span>
+      </div>
+      <div style="background:#fff;border:1px solid #E6E1D6;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;">
+        <div style="font:700 12px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;">Dimensões</div>
+        <sc-for list="{{ selDims }}" as="d" hint-placeholder-count="5">
+          <div>
+            <div style="display:flex;justify-content:space-between;gap:8px;font:600 13px Archivo;color:#33363C;margin-bottom:3px;"><span>{{ d.name }}</span><span style="white-space:nowrap;color:{{ d.fg }};">{{ d.txt }}</span></div>
+            <div style="height:6px;background:#EFEAE0;border-radius:999px;overflow:hidden;"><div style="height:6px;background:{{ d.fg }};border-radius:999px;width:{{ d.pct }}%;"></div></div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#fff;border:1px solid #E6E1D6;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font:700 12px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;">Contexto comercial (interno)</div>
+        <div style="font:400 13px/1.6 Archivo;color:#33363C;">Principal gargalo: <strong>{{ selGap }}</strong><br />Interesse em devolutiva: <strong>{{ selInteresse }}</strong><br />Tema de interesse: <strong>{{ selTema }}</strong></div>
+        <sc-if value="{{ selObstaculo }}" hint-placeholder-val="{{ false }}"><div style="font:400 13px/1.5 Archivo;color:#33363C;background:#FAF7F1;border-radius:10px;padding:10px;">Maior obstáculo: “{{ selObstaculo }}”</div></sc-if>
+      </div>
+      <div style="background:#fff;border:1px solid #E6E1D6;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 12px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;">Acompanhamento comercial</div>
+        <label style="display:flex;flex-direction:column;gap:4px;"><span style="font:600 12px Archivo;color:#6B6F76;">Status comercial</span>
+          <select value="{{ selComStatus }}" onChange="{{ onSelComStatus }}" style="padding:10px;border:1px solid #D8D2C4;border-radius:9px;font:600 13px Archivo;background:#fff;">
+            <sc-for list="{{ selComOpts }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
+          </select>
+        </label>
+        <button onClick="{{ onSelContacted }}" style="padding:11px;border-radius:10px;font:600 13px Archivo;cursor:pointer;border:1px solid {{ selCtBc }};background:{{ selCtBg }};color:{{ selCtFg }};">{{ selCtLabel }}</button>
+        <label style="display:flex;flex-direction:column;gap:4px;"><span style="font:600 12px Archivo;color:#6B6F76;">Observação interna</span>
+          <textarea value="{{ selObs }}" onChange="{{ onSelObs }}" rows="2" placeholder="Anotações da equipe VendaMais" style="padding:10px;border:1px solid #D8D2C4;border-radius:9px;font:400 13px Archivo;resize:vertical;"></textarea>
+        </label>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button onClick="{{ onSelReport }}" style-hover="background:#A6211A" style="flex:1;padding:13px;background:#C82A1E;color:#fff;border:none;border-radius:11px;font:700 14px Archivo;cursor:pointer;">Abrir leitura completa</button>
+        <button onClick="{{ onSelResend }}" style="flex:1;padding:13px;background:#fff;color:#C82A1E;border:1px solid #E0BCA8;border-radius:11px;font:600 14px Archivo;cursor:pointer;">{{ selResendLabel }}</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ sLive }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Painel do evento" style="min-height:100vh;background:#101318;color:#fff;padding:28px 24px 40px;">
+  <div style="max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:22px;">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div>
+        <div style="font:700 12px Archivo;letter-spacing:.16em;color:#E8A44A;text-transform:uppercase;">VendaMais + Cegente · Panorama ao vivo</div>
+        <h2 style="margin:4px 0 0;font:800 30px Archivo;">Radar de Crescimento Comercial</h2>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+        <sc-if value="{{ liveDemoBadge }}" hint-placeholder-val="{{ false }}"><span style="font:600 12px Archivo;background:#23314A;color:#9FC0E0;border-radius:999px;padding:6px 12px;">Dados de demonstração</span></sc-if>
+        <button onClick="{{ onLiveBack }}" style="padding:9px 14px;border-radius:999px;font:600 13px Archivo;cursor:pointer;border:1px solid #3A3E47;background:transparent;color:#C9CCD3;">Sair do telão</button>
+      </div>
+    </div>
+    <sc-if value="{{ liveWaiting }}" hint-placeholder-val="{{ false }}">
+      <div style="border:1px dashed #3A3E47;border-radius:20px;padding:70px 30px;text-align:center;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:800 40px Archivo;color:#E8A44A;">{{ liveCount }}</div>
+        <div style="font:600 18px Archivo;color:#C9CCD3;">respostas recebidas até agora</div>
+        <div style="font:400 15px/1.5 Archivo;color:#7C818B;">Os indicadores agregados aparecem a partir de 10 respostas, para preservar o anonimato dos participantes.</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ liveReady }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+        <div style="background:#181C23;border:1px solid #262B34;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:8px;justify-content:center;">
+          <div style="font:800 64px/1 Archivo;color:#E8A44A;">{{ liveCount }}</div>
+          <div style="font:600 17px Archivo;color:#C9CCD3;">diagnósticos respondidos</div>
+          <div style="font:400 14px Archivo;color:#7C818B;">Nota média do grupo: <strong style="color:#fff;">{{ liveAvg }}</strong> / 75</div>
+          <div style="border-top:1px solid #262B34;padding-top:10px;">
+            <div style="font:700 11px Archivo;letter-spacing:.1em;text-transform:uppercase;color:#7C818B;">Estágio médio do grupo</div>
+            <div style="font:800 20px Archivo;color:#E8A44A;margin-top:2px;">{{ liveStage }}</div>
+          </div>
+          <div style="font:400 14px Archivo;color:#7C818B;">Gargalo mais comum:<br /><strong style="color:#fff;font-size:16px;">{{ liveGap }}</strong></div>
+        </div>
+        <div style="background:#181C23;border:1px solid #262B34;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:11px;">
+          <div style="font:700 12px Archivo;letter-spacing:.1em;text-transform:uppercase;color:#7C818B;">As cinco dimensões, da mais forte à mais fraca</div>
+          <sc-for list="{{ liveDims }}" as="d" hint-placeholder-count="5">
+            <div>
+              <div style="display:flex;justify-content:space-between;gap:8px;font:600 15px Archivo;margin-bottom:4px;"><span>{{ d.name }}</span><span style="white-space:nowrap;color:{{ d.color }};">{{ d.score }} · {{ d.label }}</span></div>
+              <div style="height:9px;background:#262B34;border-radius:999px;overflow:hidden;"><div style="height:9px;border-radius:999px;background:{{ d.color }};width:{{ d.pct }}%;"></div></div>
+            </div>
+          </sc-for>
+          <div style="font:400 12px/1.6 Archivo;color:#7C818B;border-top:1px solid #262B34;padding-top:8px;">Cada dimensão vale de 3 a 15. Verde: bem estruturada · Âmbar: em desenvolvimento · Vermelho: ponto crítico.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="background:#181C23;border:1px solid #262B34;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:10px;">
+            <div style="font:700 12px Archivo;letter-spacing:.1em;text-transform:uppercase;color:#4FA46F;">Maiores forças do grupo</div>
+            <sc-for list="{{ liveForces }}" as="f" hint-placeholder-count="2">
+              <div>
+                <div style="display:flex;justify-content:space-between;gap:8px;font:700 15px Archivo;margin-bottom:3px;"><span>{{ f.name }}</span><span style="white-space:nowrap;color:{{ f.color }};font-size:13px;">{{ f.score }} de 15</span></div>
+                <div style="height:8px;background:#262B34;border-radius:999px;overflow:hidden;"><div style="height:8px;border-radius:999px;background:{{ f.color }};width:{{ f.pct }}%;"></div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#181C23;border:1px solid #262B34;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:10px;">
+            <div style="font:700 12px Archivo;letter-spacing:.1em;text-transform:uppercase;color:#E07B74;">Maiores dificuldades</div>
+            <sc-for list="{{ liveDiffs }}" as="f" hint-placeholder-count="2">
+              <div>
+                <div style="display:flex;justify-content:space-between;gap:8px;font:700 15px Archivo;margin-bottom:3px;"><span>{{ f.name }}</span><span style="white-space:nowrap;color:{{ f.color }};font-size:13px;">{{ f.score }} de 15</span></div>
+                <div style="height:8px;background:#262B34;border-radius:999px;overflow:hidden;"><div style="height:8px;border-radius:999px;background:{{ f.color }};width:{{ f.pct }}%;"></div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="font:700 13px Archivo;letter-spacing:.1em;text-transform:uppercase;color:#7C818B;margin-top:4px;">Temas mais desejados para conversar com a VendaMais</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+        <sc-for list="{{ liveTemas }}" as="p" hint-placeholder-count="4">
+          <div style="background:#181C23;border:1px solid #262B34;border-radius:20px;padding:22px;">
+            <div style="font:800 44px/1 Archivo;color:#E8A44A;">{{ p.pct }}%</div>
+            <div style="height:8px;background:#262B34;border-radius:999px;overflow:hidden;margin-top:12px;"><div style="height:8px;background:#E8A44A;border-radius:999px;width:{{ p.pct }}%;"></div></div>
+            <div style="font:600 14px/1.4 Archivo;color:#9CA1AB;margin-top:10px;">{{ p.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <div style="display:flex;align-items:center;gap:16px;justify-content:center;">
+      <div style="width:150px;height:46px;background:rgba(255,255,255,.92);border-radius:9px;padding:4px;"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="rc-logo-vendamais-live" shape="rounded" radius="7" fit="contain" src="./logo-vendamais.jpg" placeholder="VendaMais" hint-size="142px,38px"></x-import></div>
+      <div style="width:120px;height:46px;background:rgba(255,255,255,.92);border-radius:9px;padding:4px;"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="rc-logo-cegente-live" shape="rounded" radius="7" fit="contain" src="./logo-cegente.png" placeholder="Cegente" hint-size="112px,38px"></x-import></div>
+    </div>
+    <div style="text-align:center;font:400 12px Archivo;color:#5C616B;">Painel agregado e anônimo — nenhum dado individual é exibido. Uma iniciativa VendaMais em parceria com Cegente.</div>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:900},&quot;telaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;inicio&quot;,&quot;resultado&quot;,&quot;admin&quot;,&quot;telao&quot;],&quot;default&quot;:&quot;inicio&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Protótipo&quot;},&quot;dadosDemo&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Protótipo&quot;}}">
+class Component extends DCLogic {
+  state = { screen:'home', qi:0, ans:new Array(18).fill(undefined),
+    form:{nome:'',empresa:'',email:'',whats:'',cidade:'',uf:'',cargo:'',segmento:'',vend:'',unid:'',fat:'',consent:false},
+    errId:'', errProf:'', resumeAsk:false, draft:null,
+    result:null, resProfile:null, resCtx:'session', resCode:'',
+    saveSt:'idle', mailSt:'idle',
+    reopen:'', reopenErr:'', pw:'', pwErr:'', adminAuthed:false, tab:'geral', selId:null,
+    filters:{segmento:'Todos',cargo:'Todos',estagio:'Todos',fat:'Todos',interesse:'Todos',tema:'Todos',lead:'Todos',uf:'Todos',mail:'Todos'},
+    obs:{}, comSt:{}, contacted:{}, mailOv:{}, sessionRecs:[] };
+
+  get DATA(){
+    if(this._D) return this._D;
+    const D={};
+    D.dims=[
+      {name:'Clareza estratégica',short:'Estratégia',strong:'A empresa demonstra clareza sobre onde quer crescer e quais frentes priorizar. Essa direção facilita concentrar energia comercial no que mais gera resultado.',rec:'Sua empresa pode ter oportunidades para definir melhor onde crescer, quais clientes priorizar, quais mercados atacar e quais movimentos comerciais devem receber mais energia.'},
+      {name:'Diferenciação e proposta de valor',short:'Valor',strong:'A equipe consegue comunicar diferenciais e vender valor sem depender só de preço. Esse é um ativo poderoso para proteger margem e ganhar preferência.',rec:'Sua empresa pode ter oportunidades para comunicar melhor seus diferenciais, vender mais valor e reduzir a dependência de preço ou desconto.'},
+      {name:'Máquina comercial',short:'Processo',strong:'Há processo, geração de oportunidades e acompanhamento de indicadores. Essa base traz previsibilidade e permite escalar com mais segurança.',rec:'Sua empresa pode ter oportunidades para estruturar melhor funil, prospecção, CRM, indicadores, acompanhamento de oportunidades e previsibilidade de vendas.'},
+      {name:'Equipe e liderança',short:'Equipe',strong:'A equipe vende de forma consultiva e a liderança acompanha a execução com método. Isso eleva o padrão de toda a operação comercial.',rec:'Sua empresa pode ter oportunidades para preparar melhor vendedores e líderes, fortalecer rituais de gestão e melhorar a execução comercial no dia a dia.'},
+      {name:'Execução e crescimento',short:'Execução',strong:'A estratégia vira execução, com responsáveis, prazos e acompanhamento. O crescimento depende mais de método do que de esforço isolado.',rec:'Sua empresa pode ter oportunidades para transformar planos em ações concretas, com responsáveis, prazos, acompanhamento e disciplina de execução.'}];
+    D.q=[
+      {type:'scale',dim:0,t:'A empresa tem clareza sobre onde quer crescer nos próximos 12 meses.'},
+      {type:'scale',dim:0,t:'Temos prioridades comerciais bem definidas, e não apenas metas genéricas de crescimento.'},
+      {type:'scale',dim:0,t:'Sabemos quais clientes, mercados ou segmentos devem receber mais foco comercial.'},
+      {type:'scale',dim:1,t:'Nossa equipe consegue explicar claramente por que o cliente deveria escolher nossa empresa e não o concorrente.'},
+      {type:'scale',dim:1,t:'Conseguimos vender valor sem depender excessivamente de preço, desconto ou condição comercial.'},
+      {type:'scale',dim:1,t:'Nossa proposta comercial comunica bem os diferenciais, benefícios e resultados que entregamos ao cliente.'},
+      {type:'scale',dim:2,t:'Temos um processo comercial claro, com etapas, responsabilidades e próximos passos bem definidos.'},
+      {type:'scale',dim:2,t:'A empresa gera oportunidades comerciais de forma consistente, e não apenas quando o mercado está aquecido.'},
+      {type:'scale',dim:2,t:'Acompanhamos indicadores comerciais importantes, como oportunidades, conversão, ticket médio, ciclo de vendas e motivos de perda.'},
+      {type:'scale',dim:3,t:'Nossa equipe comercial está preparada para vender de forma consultiva e conduzir melhor as negociações.'},
+      {type:'scale',dim:3,t:'Os líderes comerciais acompanham a execução com frequência, método e conversas produtivas com o time.'},
+      {type:'scale',dim:3,t:'Temos rituais de gestão comercial, como reuniões, análise de pipeline, acompanhamento de metas e planos de ação.'},
+      {type:'scale',dim:4,t:'A empresa transforma estratégia em execução, com responsáveis, prazos e acompanhamento.'},
+      {type:'scale',dim:4,t:'Hoje, nosso crescimento depende mais de método e gestão do que apenas do esforço individual de algumas pessoas.'},
+      {type:'scale',dim:4,t:'Se quisermos crescer mais, sabemos quais mudanças comerciais precisam ser feitas primeiro.'},
+      {type:'open',t:'Na sua visão, qual é hoje o maior obstáculo para a empresa crescer mais?'},
+      {type:'single',key:'interesse',t:'Você gostaria de receber uma leitura consultiva da VendaMais sobre os principais pontos identificados neste diagnóstico?',opts:['Sim, por WhatsApp','Sim, por e-mail','Sim, por telefone','Talvez, posso avaliar depois','Não neste momento']},
+      {type:'single',key:'tema',t:'Qual tema faria mais sentido aprofundar em uma conversa com a VendaMais?',opts:['Estratégia comercial','Crescimento de vendas','Treinamento da equipe comercial','Liderança comercial','Prospecção e geração de oportunidades','Gestão de carteira de clientes','Negociação e defesa de valor','CRM, indicadores e rotina comercial','Estruturação do processo comercial','Consultoria comercial','Outro']}];
+    D.scale=[
+      {v:1,t:'Discordo totalmente'},{v:2,t:'Discordo parcialmente'},{v:3,t:'Neutro / em desenvolvimento'},{v:4,t:'Concordo parcialmente'},{v:5,t:'Concordo totalmente'}];
+    D.classes=[
+      {min:15,max:30,name:'Crescimento vulnerável',desc:'A empresa possui oportunidades importantes de estruturação comercial. O crescimento pode depender muito de esforço individual, relacionamento pessoal, mercado aquecido ou ação direta dos sócios e líderes.',msg:'Sua empresa parece ter espaço relevante para estruturar melhor estratégia, processo, equipe e execução comercial. O crescimento pode estar acontecendo, mas provavelmente ainda depende demais de pessoas-chave, improviso ou oportunidades pontuais.'},
+      {min:31,max:45,name:'Crescimento em construção',desc:'A empresa já possui algumas práticas comerciais importantes, mas ainda pode ter gargalos de clareza, processo, liderança, indicadores ou previsibilidade.',msg:'Sua empresa já tem elementos importantes para crescer, mas ainda pode evoluir na organização da estratégia comercial, na gestão da equipe e na transformação de oportunidades em resultados previsíveis.'},
+      {min:46,max:60,name:'Crescimento estruturado',desc:'A empresa possui uma base comercial mais organizada, com boas práticas em estratégia, equipe, processo e gestão, mas ainda pode encontrar gargalos para escalar.',msg:'Sua empresa demonstra boa maturidade comercial. O próximo desafio pode ser transformar essa estrutura em crescimento mais previsível, escalável e menos dependente de pessoas específicas.'},
+      {min:61,max:75,name:'Crescimento escalável',desc:'A empresa demonstra alto nível de maturidade comercial, com clareza estratégica, processo, equipe, liderança e execução bem encaminhados.',msg:'Sua empresa apresenta sinais de maturidade comercial elevada. O desafio passa a ser acelerar crescimento com consistência, proteger diferenciais e manter execução forte à medida que a operação ganha escala.'}];
+    D.ufs=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+    D.cargos=['Sócio ou proprietário','CEO ou presidente','Diretor comercial','Diretor (outras áreas)','Gerente comercial','Gerente (outras áreas)','Coordenador ou supervisor','Consultor ou vendedor','Outro'];
+    D.segmentos=['Indústria','Distribuição / Atacado','Varejo','Serviços','Tecnologia / Software','Construção / Imobiliário','Agronegócio','Saúde','Educação','Logística / Transporte','Outro'];
+    D.vends=['1 a 3','4 a 10','11 a 25','26 a 50','Mais de 50','Não se aplica'];
+    D.unids=['1 unidade','2 a 5 unidades','6 a 20 unidades','Mais de 20 unidades'];
+    D.fats=['Até R$ 500 mil/mês','De R$ 500 mil a R$ 1 milhão/mês','De R$ 1 milhão a R$ 3 milhões/mês','De R$ 3 milhões a R$ 10 milhões/mês','Acima de R$ 10 milhões/mês','Prefiro não informar'];
+    D.nextSteps={
+      'Crescimento vulnerável':'Escolha um único ponto de atenção deste radar para organizar nos próximos 30 dias. Comece pelo gargalo indicado acima — pequenas rotinas de estratégia e processo já reduzem a dependência de pessoas-chave.',
+      'Crescimento em construção':'Transforme as práticas que já existem em rotina consistente. Priorize o gargalo indicado acima e defina responsáveis, indicadores e um ritual semanal de acompanhamento.',
+      'Crescimento estruturado':'O foco agora é previsibilidade e escala. Use o gargalo indicado para padronizar o que funciona e reduzir a dependência de pessoas específicas.',
+      'Crescimento escalável':'Proteja seus diferenciais e mantenha execução forte enquanto cresce. Compare unidades ou equipes, documente as melhores práticas e teste iniciativas ampliáveis com segurança.'};
+    const A=(o,d,q1,q2,q3)=>o; // placeholder
+    D.demo=[
+      {id:'d1',code:'RC-DEMO-01',nome:'Eduardo Marques',empresa:'Marques Distribuidora',email:'eduardo@marquesdist.com.br',whats:'(17) 99811-2020',cidade:'São José do Rio Preto',uf:'SP',cargo:'Sócio ou proprietário',segmento:'Distribuição / Atacado',vend:'11 a 25',unid:'2 a 5 unidades',fat:'De R$ 3 milhões a R$ 10 milhões/mês',dia:'12/08',hora:'09:42',completed:true,mail:{status:'enviado',tries:1,date:'12/08 09:45',err:''},ans:[2,2,2,3,2,3,2,2,1,3,2,2,2,2,2,'Falta processo comercial, hoje depende muito de mim e de dois vendedores antigos.','Sim, por WhatsApp','Estruturação do processo comercial']},
+      {id:'d2',code:'RC-DEMO-02',nome:'Carla Nogueira',empresa:'Nogueira Serviços Industriais',email:'carla@nogueiraind.com.br',whats:'(16) 99722-3030',cidade:'Ribeirão Preto',uf:'SP',cargo:'Diretor comercial',segmento:'Serviços',vend:'4 a 10',unid:'1 unidade',fat:'De R$ 1 milhão a R$ 3 milhões/mês',dia:'12/08',hora:'10:05',completed:true,mail:{status:'enviado',tries:1,date:'12/08 10:08',err:''},ans:[4,3,4,4,3,4,3,2,2,3,3,2,3,3,3,'Geração de oportunidades novas de forma constante.','Sim, por e-mail','Prospecção e geração de oportunidades']},
+      {id:'d3',code:'RC-DEMO-03',nome:'Rafael Teixeira',empresa:'Teixeira Tech',email:'rafael@teixeiratech.com.br',whats:'',cidade:'Campinas',uf:'SP',cargo:'CEO ou presidente',segmento:'Tecnologia / Software',vend:'11 a 25',unid:'1 unidade',fat:'De R$ 1 milhão a R$ 3 milhões/mês',dia:'12/08',hora:'10:40',completed:true,mail:{status:'enviado',tries:1,date:'12/08 10:43',err:''},ans:[4,4,4,5,4,4,4,3,4,4,4,3,4,4,4,'Escalar o time de vendas mantendo o padrão de qualidade.','Talvez, posso avaliar depois','Crescimento de vendas']},
+      {id:'d4',code:'RC-DEMO-04',nome:'Simone Prado',empresa:'Prado Construções',email:'simone@pradoconstrucoes.com.br',whats:'(17) 99633-4141',cidade:'Araçatuba',uf:'SP',cargo:'Diretor (outras áreas)',segmento:'Construção / Imobiliário',vend:'4 a 10',unid:'1 unidade',fat:'De R$ 500 mil a R$ 1 milhão/mês',dia:'12/08',hora:'11:15',completed:true,mail:{status:'erro',tries:3,date:'12/08 11:18',err:'Endereço de destino inexistente'},ans:[3,2,3,2,2,3,2,3,2,3,3,2,3,3,3,'','Não neste momento','Estratégia comercial']},
+      {id:'d5',code:'RC-DEMO-05',nome:'Marcelo Bittencourt',empresa:'Bittencourt Agro',email:'marcelo@bittencourtagro.com.br',whats:'(17) 99544-5252',cidade:'Barretos',uf:'SP',cargo:'Sócio ou proprietário',segmento:'Agronegócio',vend:'26 a 50',unid:'6 a 20 unidades',fat:'Acima de R$ 10 milhões/mês',dia:'12/08',hora:'11:50',completed:true,mail:{status:'enviado',tries:1,date:'12/08 11:53',err:''},ans:[4,4,3,4,3,4,4,4,3,4,4,4,4,4,4,'Manter consistência de gestão com a expansão para novas praças.','Sim, por telefone','Liderança comercial']},
+      {id:'d6',code:'RC-DEMO-06',nome:'Patrícia Lemos',empresa:'Lemos Varejo',email:'patricia@lemosvarejo.com.br',whats:'(11) 99455-6363',cidade:'São Paulo',uf:'SP',cargo:'Gerente comercial',segmento:'Varejo',vend:'26 a 50',unid:'6 a 20 unidades',fat:'De R$ 3 milhões a R$ 10 milhões/mês',dia:'12/08',hora:'13:20',completed:true,mail:{status:'enviado',tries:2,date:'12/08 13:26',err:''},ans:[3,3,2,3,2,3,3,3,3,2,2,2,3,3,2,'Vendedores muito dependentes de desconto para fechar.','Sim, por WhatsApp','Negociação e defesa de valor']},
+      {id:'d7',code:'RC-DEMO-07',nome:'André Fontana',empresa:'Fontana Logística',email:'andre@fontanalog.com.br',whats:'',cidade:'São José do Rio Preto',uf:'SP',cargo:'Diretor comercial',segmento:'Logística / Transporte',vend:'11 a 25',unid:'2 a 5 unidades',fat:'De R$ 1 milhão a R$ 3 milhões/mês',dia:'12/08',hora:'13:55',completed:true,mail:{status:'enviado',tries:1,date:'12/08 13:58',err:''},ans:[3,3,3,3,3,3,2,2,2,3,2,2,2,2,3,'Previsibilidade de vendas, oscila muito de mês a mês.','Sim, por e-mail','CRM, indicadores e rotina comercial']},
+      {id:'d8',code:'RC-DEMO-08',nome:'Juliana Castro',empresa:'Castro Educação',email:'juliana@castroedu.com.br',whats:'(17) 99366-7474',cidade:'Catanduva',uf:'SP',cargo:'Sócio ou proprietário',segmento:'Educação',vend:'1 a 3',unid:'1 unidade',fat:'Até R$ 500 mil/mês',dia:'12/08',hora:'14:30',completed:true,mail:{status:'fila',tries:0,date:'—',err:''},ans:[2,2,2,3,3,2,1,2,1,2,2,1,2,2,2,'Não temos processo nenhum, é tudo no boca a boca.','Talvez, posso avaliar depois','Estruturação do processo comercial']},
+      {id:'d9',code:'RC-DEMO-09',nome:'Rogério Alves',empresa:'Alves Indústria',email:'rogerio@alvesind.com.br',whats:'(16) 99277-8585',cidade:'Franca',uf:'SP',cargo:'CEO ou presidente',segmento:'Indústria',vend:'Mais de 50',unid:'2 a 5 unidades',fat:'Acima de R$ 10 milhões/mês',dia:'12/08',hora:'15:05',completed:true,mail:{status:'enviado',tries:1,date:'12/08 15:08',err:''},ans:[5,5,4,5,4,5,4,4,4,4,4,4,5,4,4,'Sustentar o crescimento sem perder rentabilidade.','Sim, por telefone','Consultoria comercial']},
+      {id:'d10',code:'RC-DEMO-10',nome:'Fernanda Dias',empresa:'Dias Saúde',email:'fernanda@diassaude.com.br',whats:'(17) 99188-9696',cidade:'Bebedouro',uf:'SP',cargo:'Gerente comercial',segmento:'Saúde',vend:'4 a 10',unid:'1 unidade',fat:'De R$ 500 mil a R$ 1 milhão/mês',dia:'12/08',hora:'15:40',completed:true,mail:{status:'enviado',tries:1,date:'12/08 15:43',err:''},ans:[3,3,3,4,3,4,3,3,3,3,3,3,3,3,3,'Formar líderes internos para não centralizar em mim.','Sim, por WhatsApp','Treinamento da equipe comercial']},
+      {id:'d11',code:'RC-DEMO-11',nome:'Vinícius Ramos',empresa:'Ramos Atacado',email:'vinicius@ramosatacado.com.br',whats:'(17) 99099-1010',cidade:'Votuporanga',uf:'SP',cargo:'Sócio ou proprietário',segmento:'Distribuição / Atacado',vend:'11 a 25',unid:'2 a 5 unidades',fat:'De R$ 1 milhão a R$ 3 milhões/mês',dia:'12/08',hora:'16:10',completed:true,mail:{status:'enviado',tries:1,date:'12/08 16:13',err:''},ans:[2,3,2,3,2,2,2,3,2,3,2,3,2,2,2,'Falta clareza de para onde crescer, atiro para todo lado.','Sim, por WhatsApp','Estratégia comercial']},
+      {id:'d12',code:'RC-DEMO-12',nome:'Beatriz Moura',empresa:'Moura Consultoria',email:'beatriz@mouraconsult.com.br',whats:'',cidade:'São José do Rio Preto',uf:'SP',cargo:'Consultor ou vendedor',segmento:'Serviços',vend:'1 a 3',unid:'1 unidade',fat:'Prefiro não informar',dia:'12/08',hora:'16:35',completed:false,mail:{status:'—',tries:0,date:'—',err:''},ans:[3,3,2,4,3]}];
+    this._D=D; return D;
+  }
+
+  componentDidMount(){
+    try{
+      const recs=JSON.parse(localStorage.getItem('rclopas_recs')||'[]');
+      const draft=JSON.parse(localStorage.getItem('rclopas_draft')||'null');
+      this.setState({sessionRecs:recs,draft,resumeAsk:!!(draft&&(draft.form.nome||draft.ans.some(a=>a!==undefined&&a!==null)))});
+    }catch(e){}
+    try{ const m=(location.hash||'').match(/r=([A-Za-z0-9-]+)/);
+      if(m){ const rec=this.records().find(r=>r.completed&&r.code.toUpperCase()===m[1].toUpperCase()); if(rec){ this.openRecord(rec,'view'); return; } }
+    }catch(e){}
+    const t=this.props.telaInicial;
+    if(t==='admin') this.setState({adminAuthed:true,screen:'admin'});
+    else if(t==='telao') this.setState({screen:'live'});
+    else if(t==='resultado'){ const d=this.DATA.demo[1]; this.openRecord(d,'demo'); }
+  }
+  saveDraft(extra){ const s={...this.state,...extra};
+    try{ localStorage.setItem('rclopas_draft',JSON.stringify({form:s.form,ans:s.ans,qi:s.qi,step:s.screen})); }catch(e){} }
+  clearDraft(){ try{ localStorage.removeItem('rclopas_draft'); }catch(e){} }
+
+  compute(ans){
+    const D=this.DATA;
+    const dims=D.dims.map((d,i)=>{ const vs=[ans[i*3],ans[i*3+1],ans[i*3+2]].filter(v=>v>=1&&v<=5);
+      return {i,name:d.name,short:d.short,valid:vs.length,score:vs.length===3?vs.reduce((a,b)=>a+b,0):(vs.length?Math.round(vs.reduce((a,b)=>a+b,0)/vs.length*3):null)}; });
+    const valid=dims.filter(d=>d.score!=null);
+    const overall=valid.length===5?valid.reduce((a,d)=>a+d.score,0):(valid.length?Math.round(valid.reduce((a,d)=>a+d.score,0)/valid.length*5):null);
+    const cls=overall==null?null:(D.classes.find(c=>overall>=c.min&&overall<=c.max)||D.classes[0]);
+    const strong=valid.length?[...valid].sort((a,b)=>b.score-a.score)[0]:null;
+    const gap=valid.length?[...valid].sort((a,b)=>a.score-b.score)[0]:null;
+    return {dims,overall,cls,strong,gap,interesse:ans[16]||null,tema:ans[17]||null,obstaculo:ans[15]||''};
+  }
+  bandOf(score){ return score>=12?{label:'Bem estruturada',color:'#1E7F4F'}:score>=8?{label:'Em desenvolvimento',color:'#B4841E'}:{label:'Ponto crítico',color:'#9A2B26'}; }
+  lead(r){
+    const ans=r.ans||[];
+    const decisor=['Sócio ou proprietário','CEO ou presidente','Diretor comercial','Diretor (outras áreas)','Gerente comercial'].includes(r.cargo);
+    const infl=['Gerente (outras áreas)','Coordenador ou supervisor'].includes(r.cargo);
+    const cargoPts=decisor?2:(infl?1:0);
+    const fatPts={'De R$ 1 milhão a R$ 3 milhões/mês':2,'De R$ 3 milhões a R$ 10 milhões/mês':2,'Acima de R$ 10 milhões/mês':2,'De R$ 500 mil a R$ 1 milhão/mês':1}[r.fat]||0;
+    const vendPts={'11 a 25':2,'26 a 50':2,'Mais de 50':2,'4 a 10':1}[r.vend]||0;
+    const portePts=Math.max(fatPts,vendPts);
+    const dor=(ans[15]||'').trim().length>=15?1:0;
+    const interesse=ans[16]||'';
+    const fit=cargoPts+portePts+dor;
+    let cls;
+    if(!interesse||interesse.indexOf('Não')===0) cls='Nutrição';
+    else if(interesse.indexOf('Sim')===0) cls=fit>=3?'Quente':'Morno';
+    else cls=fit>=3?'Morno':'Nutrição';
+    return {cls,cargoPts,portePts,dor,fit};
+  }
+  records(){ const demoOn=this.props.dadosDemo!==false;
+    return [...(demoOn?this.DATA.demo:[]),...this.state.sessionRecs.filter(r=>!r.replaced)]; }
+  mailOf(r){ return this.state.mailOv[r.id]||r.mail; }
+  setForm(k,v){ const form={...this.state.form,[k]:v}; this.setState({form},()=>this.saveDraft()); }
+  setAns(i,v){ const ans=[...this.state.ans]; ans[i]=v; this.setState({ans},()=>this.saveDraft());
+    if(this.DATA.q[i].type!=='open'){ setTimeout(()=>{ if(this.state.screen!=='quiz')return; if(this.state.qi===i){ if(i<17)this.setState({qi:i+1}); else this.finish(); } },240); } }
+  genCode(){ const c='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let s='RC-'; for(let i=0;i<8;i++){ if(i===4)s+='-'; s+=c[Math.floor(Math.random()*c.length)]; } return s; }
+  finish(){
+    if(this.state.screen==='proc')return;
+    this.setState({screen:'proc'});
+    setTimeout(()=>{
+      const {form,ans}=this.state; const code=this.genCode(); const now=new Date();
+      const rec={id:'s'+now.getTime(),code,...form,dia:now.toLocaleDateString('pt-BR').slice(0,5),hora:now.toTimeString().slice(0,5),completed:true,mail:{status:'fila',tries:0,date:'—',err:''},ans:[...ans]};
+      const sessionRecs=[...this.state.sessionRecs,rec];
+      try{ localStorage.setItem('rclopas_recs',JSON.stringify(sessionRecs)); }catch(e){}
+      this.clearDraft();
+      this.setState({sessionRecs,resProfile:rec,result:this.compute(ans),resCode:code,resCtx:'session',screen:'result',saveSt:'saving',mailSt:'idle'});
+      setTimeout(()=>this.setState({saveSt:'saved',mailSt:'fila'}),800);
+      setTimeout(()=>{ this.updMail(rec.id,{status:'enviado',tries:1,date:rec.dia+' '+rec.hora,err:''}); this.setState({mailSt:'enviado'}); },2600);
+    },2000);
+  }
+  updMail(id,mail){ const sessionRecs=this.state.sessionRecs.map(r=>r.id===id?{...r,mail}:r);
+    try{ localStorage.setItem('rclopas_recs',JSON.stringify(sessionRecs)); }catch(e){}
+    this.setState({sessionRecs,mailOv:{...this.state.mailOv,[id]:mail}}); }
+  openRecord(rec,ctx){ const ans=rec.ans.length>=18?rec.ans:[...rec.ans,...new Array(18-rec.ans.length).fill(3)];
+    this.setState({resProfile:rec,result:this.compute(ans),resCode:rec.code,resCtx:ctx,screen:'result'}); }
+  chip(t,sel,on){ return {t,on,bc:sel?'#C82A1E':'#D8D2C4',bg:sel?'#FBF1EC':'#fff',fg:sel?'#A6211A':'#33363C'}; }
+  bar(list){ const mx=Math.max(1,...list.map(x=>x.n)); return list.map(x=>({...x,pct:Math.round(x.n/mx*100)})); }
+  csv(name,rows){ const esc=v=>{v=(v==null?'':String(v)); return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+    const txt=rows.map(r=>r.map(esc).join(';')).join('\n');
+    const b=new Blob(['\uFEFF'+txt],{type:'text/csv;charset=utf-8'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000); }
+
+  renderVals(){
+    const st=this.state, D=this.DATA, S=this.state.screen;
+    const nav=s=>e=>{ if(e&&e.preventDefault)e.preventDefault(); this.setState({screen:s}); };
+    const v={ sHome:S==='home',sIdent:S==='ident',sProfile:S==='profile',sScale:S==='scale',sQuiz:S==='quiz',sProc:S==='proc',sResult:S==='result',sReopen:S==='reopen',sLogin:S==='login',sAdmin:S==='admin',sLive:S==='live',
+      navHome:nav('home'),navReopen:nav('reopen'),navLogin:nav('login'),navLive:nav('live'),resumeAsk:st.resumeAsk,
+      onResume:()=>{ const d=st.draft; if(d) this.setState({form:d.form,ans:d.ans,qi:d.qi||0,resumeAsk:false,screen:d.step&&d.step!=='home'?d.step:'ident'}); },
+      onDiscard:()=>{ this.clearDraft(); this.setState({resumeAsk:false,draft:null}); },
+      startFlow:()=>this.setState({screen:'ident',resumeAsk:false}) };
+
+    if(S==='ident'){ const f=st.form;
+      v.idFields=[
+        {k:'nome',label:'Nome completo *',ph:'Seu nome',type:'text'},
+        {k:'empresa',label:'Empresa *',ph:'Nome da empresa',type:'text'},
+        {k:'email',label:'E-mail *',ph:'voce@empresa.com.br',type:'email'},
+        {k:'whats',label:'WhatsApp *',ph:'(00) 00000-0000',type:'tel'}
+      ].map(x=>({...x,value:f[x.k],on:e=>this.setForm(x.k,e.target.value)}));
+      v.cidadeVal=f.cidade; v.onCidade=e=>this.setForm('cidade',e.target.value);
+      v.ufVal=f.uf; v.onUf=e=>this.setForm('uf',e.target.value); v.ufOpts=['UF',...D.ufs];
+      v.cargoChips=D.cargos.map(c=>this.chip(c,f.cargo===c,()=>this.setForm('cargo',c)));
+      v.errId=st.errId;
+      v.onIdentNext=()=>{ const miss=[]; if(!f.nome.trim())miss.push('nome'); if(!f.empresa.trim())miss.push('empresa');
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim()))miss.push('e-mail válido'); if(!f.whats.trim())miss.push('WhatsApp');
+        if(!f.cidade.trim())miss.push('cidade'); if(!f.uf||f.uf==='UF')miss.push('estado'); if(!f.cargo)miss.push('cargo');
+        if(miss.length){ this.setState({errId:'Preencha para continuar: '+miss.join(', ')+'.'}); return; }
+        this.setState({errId:'',screen:'profile'},()=>this.saveDraft({screen:'profile'})); };
+    }
+    if(S==='profile'){ const f=st.form;
+      v.profGroups=[
+        {title:'Segmento de atuação *',chips:D.segmentos.map(c=>this.chip(c,f.segmento===c,()=>this.setForm('segmento',c)))},
+        {title:'Equipe comercial *',chips:D.vends.map(c=>this.chip(c,f.vend===c,()=>this.setForm('vend',c)))},
+        {title:'Unidades / filiais *',chips:D.unids.map(c=>this.chip(c,f.unid===c,()=>this.setForm('unid',c)))},
+        {title:'Faixa de faturamento mensal *',chips:D.fats.map(c=>this.chip(c,f.fat===c,()=>this.setForm('fat',c)))}];
+      v.onConsent=()=>this.setForm('consent',!f.consent);
+      v.consentBc=f.consent?'#1E7F4F':'#D8D2C4'; v.consentBg=f.consent?'#F2F8F3':'#fff';
+      v.consentBoxBg=f.consent?'#1E7F4F':'#fff'; v.consentMark=f.consent?'✓':'';
+      v.errProf=st.errProf; v.onProfBack=nav('ident');
+      v.onProfNext=()=>{ const miss=[]; if(!f.segmento)miss.push('segmento'); if(!f.vend)miss.push('equipe comercial');
+        if(!f.unid)miss.push('unidades'); if(!f.fat)miss.push('faturamento'); if(!f.consent)miss.push('autorização de uso dos dados');
+        if(miss.length){ this.setState({errProf:'Falta preencher: '+miss.join(', ')+'.'}); return; }
+        this.setState({errProf:'',screen:'scale'},()=>this.saveDraft({screen:'scale'})); };
+    }
+    if(S==='scale'){ v.scaleList=D.scale; v.onScaleBack=nav('profile');
+      v.onScaleNext=()=>this.setState({screen:'quiz',qi:st.ans.findIndex(a=>a===undefined)>=0?st.ans.findIndex(a=>a===undefined):0}); }
+    if(S==='quiz'){ const i=st.qi, q=D.q[i], a=st.ans[i];
+      v.qNum=i+1; v.progressPct=Math.round(i/18*100);
+      v.qText=q.t;
+      v.qDim=q.type==='scale'?('Dimensão '+(q.dim+1)+' · '+D.dims[q.dim].name):(q.type==='open'?'Pergunta aberta':'Interesse');
+      v.qScale=q.type==='scale'; v.qSingle=q.type==='single'; v.qOpen=q.type==='open';
+      if(q.type==='scale'){ v.qOpts=D.scale.map(s=>{ const sel=a===s.v; return {v:s.v,t:s.t,on:()=>this.setAns(i,s.v),bc:sel?'#C82A1E':'#E6E1D6',bg:sel?'#FBF1EC':'#fff',nbg:sel?'#C82A1E':'#EEEAE0',nfg:sel?'#fff':'#C82A1E'}; }); }
+      if(q.type==='single'){ v.qSingleOpts=q.opts.map(o=>{ const sel=a===o; return {t:o,on:()=>this.setAns(i,o),bc:sel?'#C82A1E':'#E6E1D6',bg:sel?'#FBF1EC':'#fff'}; }); }
+      if(q.type==='open'){ v.qOpenVal=a||''; v.onQOpen=e=>{ const ans=[...st.ans]; ans[i]=e.target.value; this.setState({ans},()=>this.saveDraft()); }; }
+      v.qShowNext=q.type==='open'||(q.type==='single'&&a!==undefined);
+      v.qNextLabel=i<17?'Continuar':'Ver minha leitura';
+      v.onQNext=()=>{ if(q.type==='open'&&(st.ans[i]===undefined)){ const ans=[...st.ans]; ans[i]=''; this.setState({ans}); }
+        if(i<17)this.setState({qi:i+1}); else this.finish(); };
+      v.onQBack=()=>{ if(i>0)this.setState({qi:i-1}); else this.setState({screen:'scale'}); };
+    }
+    if(S==='result'&&st.result){
+      const R=st.result, p=st.resProfile, ctx=st.resCtx;
+      v.rBackLabel=ctx==='admin'?'Voltar ao painel':(ctx==='view'?'Voltar':'');
+      v.onRBack=()=>this.setState({screen:ctx==='admin'?'admin':'home'});
+      v.rDemoBadge=ctx==='demo'||(p&&p.id&&p.id[0]==='d');
+      v.rNome=p.nome; v.rEmpresa=p.empresa; v.rLocal=p.cidade+', '+p.uf;
+      v.rDate=(p.dia||'')+(p.hora?' · '+p.hora:''); v.rCode=st.resCode;
+      v.rScore=R.overall==null?'—':R.overall;
+      v.rClsName=R.cls?R.cls.name:'Dados insuficientes'; v.rClsDesc=R.cls?R.cls.desc:''; v.rClsMsg=R.cls?R.cls.msg:'';
+      v.rShowStatus=ctx==='session';
+      v.rSaveLine=st.saveSt==='saving'?'Salvando suas respostas…':'Respostas salvas com sucesso ✓';
+      v.rSaveFg=st.saveSt==='saving'?'#B4841E':'#1E7F4F';
+      v.rMailLine=st.mailSt==='idle'?'Preparando envio do e-mail…':st.mailSt==='fila'?'E-mail na fila de envio…':'E-mail enviado para '+p.email+' ✓';
+      v.rMailFg=st.mailSt==='enviado'?'#1E7F4F':'#B4841E'; v.rShowResend=st.mailSt==='enviado';
+      v.onResend=()=>{ this.setState({mailSt:'fila'}); setTimeout(()=>{ this.updMail(p.id,{status:'enviado',tries:(this.mailOf(p).tries||1)+1,date:p.dia+' '+p.hora,err:''}); this.setState({mailSt:'enviado'}); },1400); };
+      const cx=190,cy=160,r=104;
+      const pt=(i,k)=>{ const a=(-90+i*72)*Math.PI/180; return [cx+r*k*Math.cos(a),cy+r*k*Math.sin(a)]; };
+      v.radarRings=[.25,.5,.75,1].map(k=>[0,1,2,3,4].map(i=>pt(i,k).map(n=>n.toFixed(1)).join(',')).join(' '));
+      v.radarAxes=[0,1,2,3,4].map(i=>{ const [x,y]=pt(i,1); return {x:x.toFixed(1),y:y.toFixed(1)}; });
+      v.radarPoly=R.dims.map((d,i)=>pt(i,(d.score||0)/15).map(n=>n.toFixed(1)).join(',')).join(' ');
+      v.radarDots=R.dims.map((d,i)=>{ const [x,y]=pt(i,(d.score||0)/15); return {x:x.toFixed(1),y:y.toFixed(1)}; });
+      v.radarLabels=R.dims.map((d,i)=>{ const a=(-90+i*72)*Math.PI/180; const lx=cx+(r+18)*Math.cos(a), ly=cy+(r+16)*Math.sin(a);
+        const c=Math.cos(a); const mid=Math.abs(c)<0.3;
+        const yOff=i===0?-14:0;
+        return {lx:(lx/380*100).toFixed(2),ty:((ly+yOff)/330*100).toFixed(2),tx:mid?'-50%':(c>0?'0':'-100%'),ta:mid?'center':(c>0?'left':'right'),t:d.short,s:d.score==null?'—':String(d.score)}; });
+      v.rBars=R.dims.map(d=>{ const b=d.score==null?{label:'—',color:'#D8D2C4'}:this.bandOf(d.score); return {name:d.name,pct:Math.round((d.score||0)/15*100),txt:d.score==null?'—':d.score+'/15 · '+b.label,fg:b.color,color:b.color}; });
+      v.rStrongName=R.strong?R.strong.name:'—'; v.rStrongScore=R.strong?R.strong.score:'—'; v.rStrongTxt=R.strong?D.dims[R.strong.i].strong:'';
+      v.rGapName=R.gap?R.gap.name:'—'; v.rGapTxt=R.gap?D.dims[R.gap.i].rec:'';
+      v.rNextStep=R.cls?D.nextSteps[R.cls.name]:'';
+      v.navHomeFromResult=e=>{ if(e&&e.preventDefault)e.preventDefault(); this.setState({screen:ctx==='admin'?'admin':'home',resumeAsk:false}); };
+    }
+    if(S==='reopen'){ v.reopenVal=st.reopen; v.onReopenChange=e=>this.setState({reopen:e.target.value,reopenErr:''}); v.reopenErr=st.reopenErr;
+      v.onReopenGo=()=>{ const c=st.reopen.trim().toUpperCase(); const rec=this.records().find(r=>r.completed&&r.code.toUpperCase()===c);
+        if(!rec){ this.setState({reopenErr:'Código não encontrado. Confira o código no e-mail ou na tela final.'}); return; } this.openRecord(rec,'view'); }; }
+    if(S==='login'){ v.pwVal=st.pw; v.onPwChange=e=>this.setState({pw:e.target.value,pwErr:''}); v.pwErr=st.pwErr;
+      v.onPwGo=()=>{ if(st.pw==='demo2026') this.setState({adminAuthed:true,screen:'admin',pw:'',pwErr:''}); else this.setState({pwErr:'Senha incorreta. Tente novamente.'}); }; }
+    if(S==='admin'){
+      const recs=this.records(), done=recs.filter(r=>r.completed);
+      const results=done.map(r=>({r,res:this.compute(r.ans)}));
+      const tabs=[['geral','Visão geral'],['part','Participantes'],['mail','E-mails'],['export','Exportar']];
+      v.admTabs=tabs.map(([id,t])=>{ const sel=st.tab===id; return {t,on:()=>this.setState({tab:id}),bc:sel?'#C82A1E':'#3A3E47',bg:sel?'#C82A1E':'transparent',fg:sel?'#fff':'#C9CCD3'}; });
+      v.onOpenLive=()=>this.setState({screen:'live'}); v.onLogout=()=>this.setState({adminAuthed:false,screen:'home'});
+      v.admDemoBanner=this.props.dadosDemo!==false;
+      v.tabGeral=st.tab==='geral'; v.tabPart=st.tab==='part'; v.tabMail=st.tab==='mail'; v.tabExport=st.tab==='export';
+      const mails=done.map(r=>this.mailOf(r));
+      const intSim=done.filter(r=>(r.ans[16]||'').indexOf('Sim')===0).length;
+      const leadsQ=done.filter(r=>this.lead(r).cls==='Quente').length;
+      v.admStats=[
+        {n:recs.length,label:'Participantes'},
+        {n:done.length,label:'Diagnósticos concluídos'},
+        {n:mails.filter(m=>m.status==='enviado').length,label:'E-mails enviados'},
+        {n:mails.filter(m=>m.status==='erro').length,label:'E-mails com erro'},
+        {n:intSim,label:'Querem devolutiva'},
+        {n:leadsQ,label:'Leads quentes'}];
+      const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;
+      v.admAvg=results.length?avg(results.map(x=>x.res.overall).filter(x=>x!=null)):'—';
+      v.admDims=D.dims.map((d,i)=>{ const sc=avg(results.map(x=>x.res.dims[i].score).filter(x=>x!=null)); return {name:d.name,score:results.length?sc:'—',pct:Math.round(sc/15*100)}; });
+      v.admStages=this.bar(D.classes.map(c=>({name:c.name,n:results.filter(x=>x.res.cls&&x.res.cls.name===c.name).length})));
+      const leadColor=c=>c==='Quente'?'#9A2B26':c==='Morno'?'#B4841E':'#6B6F76';
+      v.admLead=this.bar(['Quente','Morno','Nutrição'].map(c=>({name:c,n:done.filter(r=>this.lead(r).cls===c).length,color:leadColor(c)})));
+      const cnt=(arr)=>{ const m={}; arr.forEach(x=>{if(x)m[x]=(m[x]||0)+1;}); return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([name,n])=>({name,n})); };
+      v.admGap=this.bar(cnt(results.map(x=>x.res.gap?x.res.gap.name:null)));
+      v.admSeg=this.bar(cnt(done.map(r=>r.segmento)).slice(0,6));
+      v.admTema=this.bar(cnt(done.map(r=>r.ans[17])).slice(0,6));
+      const F=st.filters; const setF=k=>e=>this.setState({filters:{...st.filters,[k]:e.target.value}});
+      v.admFilters=[
+        {label:'Segmento',value:F.segmento,on:setF('segmento'),opts:['Todos',...D.segmentos]},
+        {label:'Cargo',value:F.cargo,on:setF('cargo'),opts:['Todos',...D.cargos]},
+        {label:'Estágio',value:F.estagio,on:setF('estagio'),opts:['Todos',...D.classes.map(c=>c.name)]},
+        {label:'Faturamento',value:F.fat,on:setF('fat'),opts:['Todos',...D.fats]},
+        {label:'Interesse',value:F.interesse,on:setF('interesse'),opts:['Todos','Sim','Talvez','Não']},
+        {label:'Tema',value:F.tema,on:setF('tema'),opts:['Todos',...D.q[17].opts]},
+        {label:'Prioridade',value:F.lead,on:setF('lead'),opts:['Todos','Quente','Morno','Nutrição']},
+        {label:'Estado',value:F.uf,on:setF('uf'),opts:['Todos',...Array.from(new Set(recs.map(r=>r.uf).filter(Boolean)))]},
+        {label:'E-mail',value:F.mail,on:setF('mail'),opts:['Todos','enviado','fila','erro']}];
+      const intShort=x=>!x?'—':x.indexOf('Sim')===0?x.replace('Sim, por ','Sim · '):x.indexOf('Talvez')===0?'Talvez':'Não';
+      const filtered=recs.filter(r=>{ const res=r.completed?this.compute(r.ans):null; const ld=this.lead(r).cls; const it=r.ans[16]||'';
+        if(F.segmento!=='Todos'&&r.segmento!==F.segmento)return false;
+        if(F.cargo!=='Todos'&&r.cargo!==F.cargo)return false;
+        if(F.estagio!=='Todos'&&(!res||!res.cls||res.cls.name!==F.estagio))return false;
+        if(F.fat!=='Todos'&&r.fat!==F.fat)return false;
+        if(F.interesse!=='Todos'){ const g=it.indexOf('Sim')===0?'Sim':it.indexOf('Talvez')===0?'Talvez':it?'Não':''; if(g!==F.interesse)return false; }
+        if(F.tema!=='Todos'&&r.ans[17]!==F.tema)return false;
+        if(F.lead!=='Todos'&&ld!==F.lead)return false;
+        if(F.uf!=='Todos'&&r.uf!==F.uf)return false;
+        if(F.mail!=='Todos'&&this.mailOf(r).status!==F.mail)return false;
+        return true; });
+      v.admRowCount=filtered.length+' participante'+(filtered.length===1?'':'s')+(filtered.length!==recs.length?' (de '+recs.length+')':'');
+      v.admEmpty=filtered.length===0;
+      v.admCols=['Nome','Empresa','Cargo','Cidade/UF','Segmento','Faturamento','Score','Estágio','Gargalo','Interesse','Tema','E-mail','Lead','Data'];
+      const mailChip=s=>s==='enviado'?['#EAF3EC','#1E7F4F']:s==='erro'?['#FBEDEC','#9A2B26']:s==='fila'?['#FBF1EA','#B4841E']:['#EFEAE0','#8A857A'];
+      const leadChip=c=>c==='Quente'?['#FBEDEC','#9A2B26']:c==='Morno'?['#FBF1EA','#B4841E']:['#EFEAE0','#6B6F76'];
+      v.admRows=filtered.map(r=>{ const res=r.completed?this.compute(r.ans):null; const ld=this.lead(r).cls; const m=this.mailOf(r);
+        const [mb,mf]=mailChip(m.status); const [lb,lf]=leadChip(ld);
+        return {nome:r.nome,empresa:r.empresa,cargo:r.cargo,local:r.cidade+'/'+r.uf,segmento:r.segmento,fat:(r.fat||'').replace('/mês','').replace('De ','').replace('Prefiro não informar','—'),
+          nota:res&&res.overall!=null?res.overall+'/75':'—',estagio:res&&res.cls?res.cls.name:'Incompleto',
+          gargalo:res&&res.gap?res.gap.name:'—',interesse:intShort(r.ans[16]),tema:r.ans[17]||'—',
+          mail:m.status,mailBg:mb,mailFg:mf,lead:ld,leadBg:lb,leadFg:lf,data:r.dia+' '+r.hora,onOpen:()=>this.setState({selId:r.id})}; });
+      v.admMailRows=done.map(r=>{ const m=this.mailOf(r); const [mb,mf]=mailChip(m.status);
+        return {nome:r.nome,email:r.email,status:m.status,bg:mb,fg:mf,tries:m.tries,date:m.date,err:m.err||'—',
+          onResend:()=>this.updMail(r.id,{status:'enviado',tries:(m.tries||0)+1,date:r.dia+' '+r.hora,err:''})}; });
+      v.onExportFull=()=>{
+        const head=['Origem','Código','Data','Hora','Nome','Empresa','Cargo','E-mail','WhatsApp','Cidade','UF','Segmento','Vendedores','Unidades','Faturamento',...Array.from({length:15},(_,i)=>'P'+(i+1)),'Maior obstáculo','Interesse devolutiva','Tema de interesse','Score total','Classificação','Clareza estratégica','Diferenciação e valor','Máquina comercial','Equipe e liderança','Execução e crescimento','Principal gargalo','Prioridade comercial'];
+        const rows=done.map(r=>{ const res=this.compute(r.ans); const ld=this.lead(r).cls;
+          return ['Evento VendaMais + Cegente',r.code,r.dia,r.hora,r.nome,r.empresa,r.cargo,r.email,r.whats,r.cidade,r.uf,r.segmento,r.vend,r.unid,r.fat,...Array.from({length:15},(_,i)=>r.ans[i]),r.ans[15],r.ans[16],r.ans[17],res.overall,res.cls?res.cls.name:'',...res.dims.map(d=>d.score),res.gap?res.gap.name:'',ld]; });
+        this.csv('radar-participantes.csv',[head,...rows]); };
+      v.onExportLeads=()=>{
+        const head=['Prioridade','Nome','Empresa','Cargo','E-mail','WhatsApp','Cidade/UF','Segmento','Faturamento','Score','Classificação','Principal gargalo','Tema de interesse','Interesse'];
+        const rows=done.filter(r=>this.lead(r).cls!=='Nutrição').sort((a,b)=>({Quente:0,Morno:1}[this.lead(a).cls]-{Quente:0,Morno:1}[this.lead(b).cls]))
+          .map(r=>{ const res=this.compute(r.ans); return [this.lead(r).cls,r.nome,r.empresa,r.cargo,r.email,r.whats,r.cidade+'/'+r.uf,r.segmento,r.fat,res.overall,res.cls?res.cls.name:'',res.gap?res.gap.name:'',r.ans[17],r.ans[16]]; });
+        this.csv('radar-leads.csv',[head,...rows]); };
+      const sel=recs.find(r=>r.id===st.selId); v.admSelOn=!!sel;
+      if(sel){ const res=sel.completed?this.compute(sel.ans):null; const ldObj=this.lead(sel); const m=this.mailOf(sel);
+        const [lb,lf]=leadChip(ldObj.cls);
+        v.onSelClose=()=>this.setState({selId:null});
+        v.selNome=sel.nome; v.selEmpresa=sel.empresa; v.selLocal=sel.cidade+', '+sel.uf; v.selCargo=sel.cargo; v.selSeg=sel.segmento;
+        v.selVend=sel.vend+' vendedores'; v.selUnid=sel.unid; v.selFat=sel.fat; v.selEmail=sel.email; v.selWhats=sel.whats||'';
+        v.selNota=res&&res.overall!=null?res.overall:'—'; v.selEstagio=res&&res.cls?res.cls.name:'Incompleto';
+        v.selLead=ldObj.cls; v.selLeadBg=lb; v.selLeadFg=lf;
+        v.selDims=res?res.dims.map(d=>{ const b=d.score==null?{color:'#8A857A',label:'—'}:this.bandOf(d.score); return {name:d.name,txt:d.score==null?'—':d.score+'/15',fg:b.color,pct:Math.round((d.score||0)/15*100)}; }):[];
+        v.selGap=res&&res.gap?res.gap.name:'—'; v.selInteresse=sel.ans[16]||'—'; v.selTema=sel.ans[17]||'—'; v.selObstaculo=sel.ans[15]||'';
+        v.selComOpts=['Novo','Em contato','Reunião agendada','Proposta enviada','Cliente','Sem interesse'];
+        v.selComStatus=st.comSt[sel.id]||'Novo'; v.onSelComStatus=e=>this.setState({comSt:{...st.comSt,[sel.id]:e.target.value}});
+        const ct=!!st.contacted[sel.id]; v.selCtLabel=ct?'✓ Contatado':'Marcar como contatado';
+        v.selCtBc=ct?'#1E7F4F':'#D8D2C4'; v.selCtBg=ct?'#EAF3EC':'#fff'; v.selCtFg=ct?'#1E7F4F':'#33363C';
+        v.onSelContacted=()=>this.setState({contacted:{...st.contacted,[sel.id]:!ct}});
+        v.selObs=st.obs[sel.id]||''; v.onSelObs=e=>this.setState({obs:{...st.obs,[sel.id]:e.target.value}});
+        v.onSelReport=()=>{ if(sel.completed) this.openRecord(sel,'admin'); };
+        v.selResendLabel=m.status==='erro'?'Reenviar (erro)':'Reenviar e-mail';
+        v.onSelResend=()=>this.updMail(sel.id,{status:'enviado',tries:(m.tries||0)+1,date:sel.dia+' '+sel.hora,err:''});
+      }
+    }
+    if(S==='live'){
+      const done=this.records().filter(r=>r.completed); const results=done.map(r=>this.compute(r.ans));
+      v.liveDemoBadge=this.props.dadosDemo!==false; v.onLiveBack=()=>this.setState({screen:st.adminAuthed?'admin':'home'});
+      v.liveCount=done.length; v.liveWaiting=done.length<10; v.liveReady=done.length>=10;
+      if(done.length>=10){ const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;
+        v.liveAvg=avg(results.map(r=>r.overall).filter(x=>x!=null));
+        const cls=D.classes.find(c=>v.liveAvg>=c.min&&v.liveAvg<=c.max)||D.classes[0]; v.liveStage=cls.name;
+        const dimAvgs=D.dims.map((d,i)=>({name:d.name,score:avg(results.map(r=>r.dims[i].score).filter(x=>x!=null))}));
+        const enrich=d=>{ const b=this.bandOf(d.score); return {...d,pct:Math.round(d.score/15*100),color:b.color,label:b.label}; };
+        const sorted=[...dimAvgs].sort((a,b)=>b.score-a.score);
+        v.liveDims=sorted.map(enrich); v.liveForces=sorted.slice(0,2).map(enrich); v.liveDiffs=sorted.slice(-2).reverse().map(enrich);
+        const gc={}; results.forEach(r=>{ if(r.gap)gc[r.gap.name]=(gc[r.gap.name]||0)+1; });
+        v.liveGap=(Object.entries(gc).sort((a,b)=>b[1]-a[1])[0]||['—'])[0];
+        const tc={}; done.forEach(r=>{ if(r.ans[17])tc[r.ans[17]]=(tc[r.ans[17]]||0)+1; });
+        const top=Object.entries(tc).sort((a,b)=>b[1]-a[1]).slice(0,4);
+        v.liveTemas=top.map(([label,n])=>({pct:Math.round(n/done.length*100),label}));
+      }
+    }
+    return v;
+  }
+}
+</script>
+</body>
+</html>
