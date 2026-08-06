@@ -8,6 +8,9 @@ import { diaHora } from "@/lib/datetime";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Dá folga para o envio do e-mail em segundo plano (after) concluir na função
+// serverless da Vercel. 30s cabe no limite do plano Hobby (até 60s).
+export const maxDuration = 30;
 
 // Reenvia o e-mail da leitura. O código é o token de acesso — vale tanto
 // para o participante (tela de resultado) quanto para o admin (painel).

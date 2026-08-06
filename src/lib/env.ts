@@ -38,12 +38,14 @@ export const EMAIL_FROM =
 
 /**
  * URL pública base para o link do relatório no e-mail: {REPORT_BASE_URL}/r/{codigo}
- * Fallback para a URL da Vercel quando REPORT_BASE_URL não estiver definida.
+ * Quando REPORT_BASE_URL não estiver definida, as rotas usam a origem da
+ * requisição como fallback.
  */
 export function reportBaseUrl(): string {
   const explicit = process.env.REPORT_BASE_URL;
   if (explicit) return explicit.replace(/\/+$/, "");
-  const vercel = process.env.VERCEL_URL;
-  if (vercel) return `https://${vercel}`.replace(/\/+$/, "");
+  // Sem REPORT_BASE_URL, as rotas usam a origem da própria requisição
+  // (new URL(req.url).origin) — o domínio que o participante acessou, mais
+  // limpo que a VERCEL_URL, que muda a cada deploy.
   return "";
 }
