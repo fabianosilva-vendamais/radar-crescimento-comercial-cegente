@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { S } from "@/lib/style";
-import { DATA, compute, lead } from "@/lib/radar-logic";
+import { DATA, compute, lead, score100, dim10, fmt10 } from "@/lib/radar-logic";
 import { supabaseBrowser, supabaseConfigured } from "@/lib/supabase-browser";
 import ResultView from "@/components/ResultView";
 
@@ -172,10 +172,10 @@ export default function AdminPage() {
       { n: intSim, label: "Querem devolutiva" },
       { n: leadsQ, label: "Leads quentes" },
     ];
-    const admAvg = results.length ? avg(results.map((x) => x.res.overall).filter((x: any) => x != null) as number[]) : "—";
+    const admAvg = results.length ? score100(avg(results.map((x) => x.res.overall).filter((x: any) => x != null) as number[])) : "—";
     const admDims = D.dims.map((d: any, i: number) => {
       const sc = avg(results.map((x) => x.res.dims[i].score).filter((x: any) => x != null) as number[]);
-      return { name: d.name, score: results.length ? sc : "—", pct: Math.round((sc / 15) * 100) };
+      return { name: d.name, score: results.length ? fmt10(dim10(sc)) : "—", pct: results.length ? Math.round((dim10(sc) as number) * 10) : 0 };
     });
     const admStages = bar(D.classes.map((c: any) => ({ name: c.name, n: results.filter((x) => x.res.cls && x.res.cls.name === c.name).length })));
     const admLead = bar(["Quente", "Morno", "Nutrição"].map((c) => ({ name: c, n: done.filter((r) => lead(r).cls === c).length, color: leadColor(c) })));
@@ -219,22 +219,22 @@ export default function AdminPage() {
   const sel = view.recs.find((r) => r.id === selId);
 
   function onExportFull() {
-    const head = ["Origem", "Código", "Data", "Hora", "Nome", "Empresa", "Cargo", "E-mail", "WhatsApp", "Cidade", "UF", "Segmento", "Vendedores", "Unidades", "Faturamento", ...Array.from({ length: 15 }, (_, i) => "P" + (i + 1)), "Maior obstáculo", "Interesse devolutiva", "Tema de interesse", "Score total", "Classificação", "Clareza estratégica", "Diferenciação e valor", "Máquina comercial", "Equipe e liderança", "Execução e crescimento", "Principal gargalo", "Prioridade comercial"];
+    const head = ["Origem", "Código", "Data", "Hora", "Nome", "Empresa", "Cargo", "E-mail", "WhatsApp", "Cidade", "UF", "Segmento", "Vendedores", "Unidades", "Faturamento", ...Array.from({ length: 15 }, (_, i) => "P" + (i + 1)), "Maior obstáculo", "Interesse devolutiva", "Tema de interesse", "Score total (0-100)", "Classificação", "Clareza estratégica (0-10)", "Diferenciação e valor (0-10)", "Máquina comercial (0-10)", "Equipe e liderança (0-10)", "Execução e crescimento (0-10)", "Principal gargalo", "Prioridade comercial"];
     const rows = view.done.map((r) => {
       const res = compute(r.ans);
       const ld = lead(r).cls;
-      return ["Evento VendaMais + Cegente", r.code, r.dia, r.hora, r.nome, r.empresa, r.cargo, r.email, r.whats, r.cidade, r.uf, r.segmento, r.vend, r.unid, r.fat, ...Array.from({ length: 15 }, (_, i) => r.ans[i]), r.ans[15], r.ans[16], r.ans[17], res.overall, res.cls ? res.cls.name : "", ...res.dims.map((d: any) => d.score), res.gap ? res.gap.name : "", ld];
+      return ["Evento VendaMais + Cegente", r.code, r.dia, r.hora, r.nome, r.empresa, r.cargo, r.email, r.whats, r.cidade, r.uf, r.segmento, r.vend, r.unid, r.fat, ...Array.from({ length: 15 }, (_, i) => r.ans[i]), r.ans[15], r.ans[16], r.ans[17], score100(res.overall), res.cls ? res.cls.name : "", ...res.dims.map((d: any) => fmt10(dim10(d.score))), res.gap ? res.gap.name : "", ld];
     });
     csv("radar-participantes.csv", [head, ...rows]);
   }
   function onExportLeads() {
-    const head = ["Prioridade", "Nome", "Empresa", "Cargo", "E-mail", "WhatsApp", "Cidade/UF", "Segmento", "Faturamento", "Score", "Classificação", "Principal gargalo", "Tema de interesse", "Interesse"];
+    const head = ["Prioridade", "Nome", "Empresa", "Cargo", "E-mail", "WhatsApp", "Cidade/UF", "Segmento", "Faturamento", "Score (0-100)", "Classificação", "Principal gargalo", "Tema de interesse", "Interesse"];
     const rows = view.done
       .filter((r) => lead(r).cls !== "Nutrição")
       .sort((a, b) => (({ Quente: 0, Morno: 1 } as any)[lead(a).cls] - ({ Quente: 0, Morno: 1 } as any)[lead(b).cls]))
       .map((r) => {
         const res = compute(r.ans);
-        return [lead(r).cls, r.nome, r.empresa, r.cargo, r.email, r.whats, r.cidade + "/" + r.uf, r.segmento, r.fat, res.overall, res.cls ? res.cls.name : "", res.gap ? res.gap.name : "", r.ans[17], r.ans[16]];
+        return [lead(r).cls, r.nome, r.empresa, r.cargo, r.email, r.whats, r.cidade + "/" + r.uf, r.segmento, r.fat, score100(res.overall), res.cls ? res.cls.name : "", res.gap ? res.gap.name : "", r.ans[17], r.ans[16]];
       });
     csv("radar-leads.csv", [head, ...rows]);
   }
@@ -311,7 +311,7 @@ export default function AdminPage() {
             </div>
             <div style={S("display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;")}>
               <div style={S("background:#fff;border:1px solid #E6E1D6;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;")}>
-                <div style={S("font:700 13px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;")}>Média por dimensão (de 15) · geral: <span style={S("color:#C82A1E;font-size:16px;")}>{view.admAvg}</span>/75</div>
+                <div style={S("font:700 13px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;")}>Média por dimensão (de 10) · geral: <span style={S("color:#C82A1E;font-size:16px;")}>{view.admAvg}</span>/100</div>
                 <BarRows items={view.admDims} color="#C82A1E" valueKey="score" />
               </div>
               <div style={S("background:#fff;border:1px solid #E6E1D6;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;")}>
@@ -381,7 +381,7 @@ export default function AdminPage() {
                           <td style={S("padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;")}>{r.cidade + "/" + r.uf}</td>
                           <td style={S("padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;")}>{r.segmento}</td>
                           <td style={S("padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;")}>{fat}</td>
-                          <td style={S("padding:11px 10px;border-bottom:1px solid #F0EBE0;font-weight:800;color:#C82A1E;")}>{res && res.overall != null ? res.overall + "/75" : "—"}</td>
+                          <td style={S("padding:11px 10px;border-bottom:1px solid #F0EBE0;font-weight:800;color:#C82A1E;")}>{res && res.overall != null ? score100(res.overall) + "/100" : "—"}</td>
                           <td style={S("padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;")}>{res && res.cls ? res.cls.name : "Incompleto"}</td>
                           <td style={S("padding:11px 10px;border-bottom:1px solid #F0EBE0;white-space:nowrap;")}>{res && res.gap ? res.gap.name : "—"}</td>
                           <td style={S("padding:11px 10px;border-bottom:1px solid #F0EBE0;")}>{intShort(r.ans[16])}</td>
@@ -484,12 +484,12 @@ function AdminDrawer({ sel, edits, onEdit, onSave, onClose, onOpenReport, onRese
           {sel.empresa} · {sel.cidade}, {sel.uf}<br />{sel.cargo} · {sel.segmento}<br />{sel.vend} vendedores · {sel.unid} · {sel.fat}<br />{sel.email}{sel.whats ? <><br />WhatsApp: {sel.whats}</> : null}
         </div>
         <div style={S("display:flex;gap:8px;flex-wrap:wrap;")}>
-          <span style={S("font:700 13px/1.4 Archivo;background:#16181D;color:#fff;border-radius:10px;padding:6px 12px;")}>{res && res.overall != null ? res.overall : "—"}/75 · {res && res.cls ? res.cls.name : "Incompleto"}</span>
+          <span style={S("font:700 13px/1.4 Archivo;background:#16181D;color:#fff;border-radius:10px;padding:6px 12px;")}>{res && res.overall != null ? score100(res.overall) : "—"}/100 · {res && res.cls ? res.cls.name : "Incompleto"}</span>
           <span style={S(`font:700 13px/1.4 Archivo;background:${lb};color:${lf};border-radius:10px;padding:6px 12px;`)}>Lead {ld}</span>
         </div>
         <div style={S("background:#fff;border:1px solid #E6E1D6;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;")}>
           <div style={S("font:700 12px Archivo;letter-spacing:.06em;text-transform:uppercase;color:#8A857A;")}>Dimensões</div>
-          {(res ? res.dims.map((d: any) => ({ name: d.name, txt: d.score == null ? "—" : d.score + "/15", fg: d.score == null ? "#8A857A" : d.score >= 12 ? "#1E7F4F" : d.score >= 8 ? "#B4841E" : "#9A2B26", pct: Math.round(((d.score || 0) / 15) * 100) })) : []).map((d: any, i: number) => (
+          {(res ? res.dims.map((d: any) => ({ name: d.name, txt: d.score == null ? "—" : fmt10(dim10(d.score)) + "/10", fg: d.score == null ? "#8A857A" : d.score >= 12 ? "#1E7F4F" : d.score >= 8 ? "#B4841E" : "#9A2B26", pct: d.score == null ? 0 : Math.round((dim10(d.score) as number) * 10) })) : []).map((d: any, i: number) => (
             <div key={i}>
               <div style={S("display:flex;justify-content:space-between;gap:8px;font:600 13px Archivo;color:#33363C;margin-bottom:3px;")}><span>{d.name}</span><span style={S(`white-space:nowrap;color:${d.fg};`)}>{d.txt}</span></div>
               <div style={S("height:6px;background:#EFEAE0;border-radius:999px;overflow:hidden;")}><div style={S(`height:6px;background:${d.fg};border-radius:999px;width:${d.pct}%;`)} /></div>
