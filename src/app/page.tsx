@@ -332,7 +332,6 @@ export default function ParticipantPage() {
             </div>
           </div>
           <div style={S("text-align:center;display:flex;flex-direction:column;gap:12px;margin-top:8px;")}>
-            <div style={S("font:700 12px Archivo;letter-spacing:.14em;color:#C82A1E;text-transform:uppercase;")}>VendaMais + Cegente · São José do Rio Preto</div>
             <h1 style={S("margin:0;font:800 34px/1.12 Archivo;letter-spacing:-.01em;color:#16181D;")}>Radar de Crescimento Comercial</h1>
             <p style={S("margin:0;font:400 17px/1.5 Archivo;color:#4C4F56;")}>Uma análise rápida para identificar os pontos que podem acelerar ou limitar o crescimento da sua empresa.</p>
           </div>
