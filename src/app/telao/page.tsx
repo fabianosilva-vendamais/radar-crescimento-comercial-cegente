@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { S } from "@/lib/style";
-import { DATA, bandOf } from "@/lib/radar-logic";
+import { DATA, bandOf, score100, dim10, fmt10 } from "@/lib/radar-logic";
 
 const D: any = DATA;
 
@@ -39,13 +39,16 @@ export default function TelaoPage() {
 
   const live = useMemo(() => {
     if (!ready || !stats) return null;
-    const liveAvg = stats.avg_overall;
-    const cls = D.classes.find((c: any) => liveAvg >= c.min && liveAvg <= c.max) || D.classes[0];
+    // avg_overall e dims chegam nas somas brutas (15..75 / 3..15) e são
+    // convertidos para a escala de exibição (0..100 / 0..10).
+    const rawAvg = stats.avg_overall;
+    const liveAvg = score100(rawAvg);
+    const cls = D.classes.find((c: any) => rawAvg >= c.min && rawAvg <= c.max) || D.classes[0];
     const dimVals: number[] = stats.dims || [];
     const dimAvgs = D.dims.map((d: any, i: number) => ({ name: d.name, score: dimVals[i] == null ? 0 : dimVals[i] }));
     const enrich = (d: any) => {
       const b = bandOf(d.score);
-      return { ...d, pct: Math.round((d.score / 15) * 100), color: b.color, label: b.label };
+      return { ...d, disp: fmt10(dim10(d.score)), pct: Math.round((dim10(d.score) as number) * 10), color: b.color, label: b.label };
     };
     const sorted = [...dimAvgs].sort((a, b) => b.score - a.score);
     const temas = (stats.temas || []).slice(0, 4).map((t: any) => ({ pct: Math.round((t.n / count) * 100), label: t.label }));
@@ -87,7 +90,7 @@ export default function TelaoPage() {
               <div style={S("background:#181C23;border:1px solid #262B34;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:8px;justify-content:center;")}>
                 <div style={S("font:800 64px/1 Archivo;color:#E8A44A;")}>{count}</div>
                 <div style={S("font:600 17px Archivo;color:#C9CCD3;")}>diagnósticos respondidos</div>
-                <div style={S("font:400 14px Archivo;color:#7C818B;")}>Nota média do grupo: <strong style={S("color:#fff;")}>{live.liveAvg}</strong> / 75</div>
+                <div style={S("font:400 14px Archivo;color:#7C818B;")}>Nota média do grupo: <strong style={S("color:#fff;")}>{live.liveAvg}</strong> / 100</div>
                 <div style={S("border-top:1px solid #262B34;padding-top:10px;")}>
                   <div style={S("font:700 11px Archivo;letter-spacing:.1em;text-transform:uppercase;color:#7C818B;")}>Estágio médio do grupo</div>
                   <div style={S("font:800 20px Archivo;color:#E8A44A;margin-top:2px;")}>{live.liveStage}</div>
@@ -100,14 +103,14 @@ export default function TelaoPage() {
                   <div key={i}>
                     <div style={S("display:flex;justify-content:space-between;gap:8px;font:600 15px Archivo;margin-bottom:4px;")}>
                       <span>{d.name}</span>
-                      <span style={S(`white-space:nowrap;color:${d.color};`)}>{d.score} · {d.label}</span>
+                      <span style={S(`white-space:nowrap;color:${d.color};`)}>{d.disp} · {d.label}</span>
                     </div>
                     <div style={S("height:9px;background:#262B34;border-radius:999px;overflow:hidden;")}>
                       <div style={S(`height:9px;border-radius:999px;background:${d.color};width:${d.pct}%;`)} />
                     </div>
                   </div>
                 ))}
-                <div style={S("font:400 12px/1.6 Archivo;color:#7C818B;border-top:1px solid #262B34;padding-top:8px;")}>Cada dimensão vale de 3 a 15. Verde: bem estruturada · Âmbar: em desenvolvimento · Vermelho: ponto crítico.</div>
+                <div style={S("font:400 12px/1.6 Archivo;color:#7C818B;border-top:1px solid #262B34;padding-top:8px;")}>Cada dimensão vale de 0 a 10. Verde: bem estruturada · Âmbar: em desenvolvimento · Vermelho: ponto crítico.</div>
               </div>
               <div style={S("display:flex;flex-direction:column;gap:16px;")}>
                 <div style={S("background:#181C23;border:1px solid #262B34;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:10px;")}>
@@ -116,7 +119,7 @@ export default function TelaoPage() {
                     <div key={i}>
                       <div style={S("display:flex;justify-content:space-between;gap:8px;font:700 15px Archivo;margin-bottom:3px;")}>
                         <span>{f.name}</span>
-                        <span style={S(`white-space:nowrap;color:${f.color};font-size:13px;`)}>{f.score} de 15</span>
+                        <span style={S(`white-space:nowrap;color:${f.color};font-size:13px;`)}>{f.disp} de 10</span>
                       </div>
                       <div style={S("height:8px;background:#262B34;border-radius:999px;overflow:hidden;")}>
                         <div style={S(`height:8px;border-radius:999px;background:${f.color};width:${f.pct}%;`)} />
@@ -130,7 +133,7 @@ export default function TelaoPage() {
                     <div key={i}>
                       <div style={S("display:flex;justify-content:space-between;gap:8px;font:700 15px Archivo;margin-bottom:3px;")}>
                         <span>{f.name}</span>
-                        <span style={S(`white-space:nowrap;color:${f.color};font-size:13px;`)}>{f.score} de 15</span>
+                        <span style={S(`white-space:nowrap;color:${f.color};font-size:13px;`)}>{f.disp} de 10</span>
                       </div>
                       <div style={S("height:8px;background:#262B34;border-radius:999px;overflow:hidden;")}>
                         <div style={S(`height:8px;border-radius:999px;background:${f.color};width:${f.pct}%;`)} />

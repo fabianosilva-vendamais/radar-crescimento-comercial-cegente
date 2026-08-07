@@ -1,6 +1,19 @@
-// Verificação: a lógica portada (src/lib/radar-logic.ts) reproduz EXATAMENTE
-// o protótipo "Radar de Crescimento Comercial.dc.html" — constantes de negócio
-// e cálculos (compute / bandOf / lead), conferidos nos participantes de demo.
+// Verificação da lógica do Radar contra o protótipo
+// "Radar de Crescimento Comercial.dc.html".
+//
+// O que É conferido (deve bater 100% com o protótipo):
+//   - as 15+3 perguntas (texto, tipo, dimensão e opções) e a escala 1..5;
+//   - nomes e faixas internas das 4 classificações (15..75);
+//   - nomes das 5 dimensões;
+//   - catálogos (UFs, cargos, segmentos, equipes, unidades, faturamentos);
+//   - bandOf (thresholds/cores/rótulos) em toda a faixa 3..15;
+//   - compute (somas, classificação, forte, gargalo) e lead nos participantes
+//     de demonstração do protótipo.
+//
+// O que NÃO é mais comparado literalmente: os textos consultivos
+// (descrições de classificação, leituras, prioridades, diagnóstico central),
+// aprofundados a pedido da VendaMais. A escala de EXIBIÇÃO é 0..100 / 0..10
+// (conversão linear das somas brutas) e é conferida nos extremos abaixo.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -36,25 +49,25 @@ const check = (name, ok, detail = "") => {
   }
 };
 
-// 3) Constantes de negócio idênticas.
+// 3) Perguntas, escala, faixas e catálogos idênticos.
 const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const pick = (arr, keys) => arr.map((o) => Object.fromEntries(keys.map((k) => [k, o[k]])));
-check("dims", eq(pick(P.DATA.dims, ["name", "short", "strong", "rec"]), pick(mine.DATA.dims, ["name", "short", "strong", "rec"])));
-check("q", eq(pick(P.DATA.q, ["type", "dim", "t", "key", "opts"]), pick(mine.DATA.q, ["type", "dim", "t", "key", "opts"])));
+check("dims (nomes)", eq(pick(P.DATA.dims, ["name", "short"]), pick(mine.DATA.dims, ["name", "short"])));
+check("q (perguntas)", eq(pick(P.DATA.q, ["type", "dim", "t", "key", "opts"]), pick(mine.DATA.q, ["type", "dim", "t", "key", "opts"])));
 check("scale", eq(P.DATA.scale, mine.DATA.scale));
-check("classes", eq(P.DATA.classes, mine.DATA.classes));
+check("classes (faixas e nomes)", eq(pick(P.DATA.classes, ["min", "max", "name"]), pick(mine.DATA.classes, ["min", "max", "name"])));
+check("nextSteps (chaves)", eq(Object.keys(P.DATA.nextSteps).sort(), Object.keys(mine.DATA.nextSteps).sort()));
 check("ufs", eq(P.DATA.ufs, mine.DATA.ufs));
 check("cargos", eq(P.DATA.cargos, mine.DATA.cargos));
 check("segmentos", eq(P.DATA.segmentos, mine.DATA.segmentos));
 check("vends", eq(P.DATA.vends, mine.DATA.vends));
 check("unids", eq(P.DATA.unids, mine.DATA.unids));
 check("fats", eq(P.DATA.fats, mine.DATA.fats));
-check("nextSteps", eq(P.DATA.nextSteps, mine.DATA.nextSteps));
 
 // 4) bandOf idêntico em toda a faixa 3..15.
 for (let s = 3; s <= 15; s++) check(`bandOf(${s})`, eq(P.bandOf(s), mine.bandOf(s)), JSON.stringify([P.bandOf(s), mine.bandOf(s)]));
 
-// 5) compute + lead idênticos em todos os participantes de demonstração.
+// 5) compute + lead idênticos (parte numérica) nos participantes de demo.
 const demo = P.DATA.demo || [];
 let cases = 0;
 for (const r of demo) {
@@ -77,8 +90,30 @@ for (const r of demo) {
   cases++;
 }
 
+// 6) Escala de exibição: conversão linear 15..75 → 0..100 e 3..15 → 0..10.
+check("score100(15)=0", mine.score100(15) === 0);
+check("score100(45)=50", mine.score100(45) === 50);
+check("score100(75)=100", mine.score100(75) === 100);
+check("dim10(3)=0", mine.dim10(3) === 0);
+check("dim10(9)=5", mine.dim10(9) === 5);
+check("dim10(15)=10", mine.dim10(15) === 10);
+check("fmt10(4.2)", mine.fmt10(4.2) === "4,2");
+check("fmt10(10)", mine.fmt10(10) === "10");
+
+// 7) Camada de interpretação presente e consistente.
+check("qInsights (15)", mine.DATA.qInsights.length === 15 && mine.DATA.qInsights.every((q) => q.prob && q.cons && q.act));
+check("dimReadings (5×3)", mine.DATA.dimReadings.length === 5 && mine.DATA.dimReadings.every((d) => d.critico && d.desenvolvimento && d.estruturado));
+check("rules (9)", mine.DATA.rules.length === 9 && mine.DATA.rules.every((r) => r.id && r.title && r.msg));
+const full = mine.compute([2, 2, 2, 3, 2, 3, 2, 2, 1, 3, 2, 2, 2, 2, 2, "obst", "Sim, por WhatsApp", "Estratégia comercial"]);
+check("compute.prios (3)", full.prios.length === 3 && full.prios.every((p) => p.prob && p.cons && p.act));
+check("compute.rule", !!full.rule && !!full.rule.msg);
+check("compute.plan (3)", full.plan.length === 3 && full.plan.every((p) => p.act));
+check("compute.readings", full.dims.every((d) => d.reading));
+const partial = mine.compute([3, 3, 2, 4, 3]);
+check("compute parcial não quebra", Array.isArray(partial.prios) && partial.dims.length === 5);
+
 if (failures === 0) {
-  console.log(`✓ Lógica idêntica ao protótipo — 11 blocos de constantes, bandOf(3..15) e compute/lead em ${cases} participantes de demonstração.`);
+  console.log(`✓ Matemática idêntica ao protótipo — perguntas, escala, faixas, bandOf(3..15) e compute/lead em ${cases} participantes de demonstração. Exibição 0-100/0-10 e camada de interpretação conferidas.`);
   process.exit(0);
 } else {
   console.log(`\n✗ ${failures} divergência(s) encontrada(s).`);

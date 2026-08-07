@@ -9,23 +9,28 @@ e-mail por SMTP (Gmail).
 > projeto no Supabase e um **novo** projeto na Vercel para este Radar. Nenhuma
 > chave, tabela ou URL é compartilhada com o Raio-X Lopas Conecta.
 
-**Nenhum texto, pergunta, pontuação, classificação ou regra do diagnóstico foi
-alterado.** A lógica determinística foi portada verbatim
-(`src/lib/radar-logic.ts`) e conferida automaticamente contra o protótipo
-(constantes de negócio, `bandOf(3..15)` e `compute`/`lead` nos 12 participantes
-de demonstração — batem 100%). Rode a conferência com:
+**As 15 perguntas e a matemática do diagnóstico são as do protótipo** (conferidas
+automaticamente contra ele — `npm run verify-logic`). A pedido da VendaMais, a
+**exibição** usa escala humana (0–100 e 0–10) e a leitura foi **aprofundada** com
+uma camada de interpretação consultiva (leitura por dimensão, diagnóstico
+central, três prioridades e plano de 90 dias) em `src/lib/radar-logic.ts`.
 
 ```bash
 npm run verify-logic
 ```
 
-## Pontuação (inalterada)
+## Pontuação
 
-- 5 dimensões, cada uma com 3 perguntas de escala (1 a 5) → **3 a 15 por dimensão**.
-- Nota total = soma das 5 dimensões → **15 a 75**.
-- 4 classificações: Crescimento vulnerável (15–30), em construção (31–45),
-  estruturado (46–60), escalável (61–75).
+- 5 dimensões, cada uma com 3 perguntas de escala (1 a 5). Internamente (e no
+  banco) as somas continuam 3–15 por dimensão e 15–75 no total — a mesma
+  matemática do protótipo.
+- **Exibição:** nota total convertida linearmente para **0–100**
+  (`(soma−15)/60×100`) e cada dimensão para **0–10** (`(soma−3)/12×10`).
+- 4 classificações (faixas equivalentes em 0–100): Crescimento vulnerável
+  (0–25), em construção (26–50), estruturado (51–75), escalável (76–100).
 - Prioridade comercial interna (Quente / Morno / Nutrição) — nunca visível ao participante.
+- O código da leitura não é mais exibido na tela de resultado; a reabertura é
+  feita pelo botão do e-mail (`/r/{codigo}`).
 
 ## Rotas
 

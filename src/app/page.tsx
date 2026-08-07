@@ -560,7 +560,7 @@ export default function ParticipantPage() {
         <div data-screen-label="Reabrir leitura" style={S("max-width:460px;margin:0 auto;padding:40px 20px;display:flex;flex-direction:column;gap:16px;")}>
           <button onClick={backHome} style={S("align-self:flex-start;background:none;border:none;font:600 15px Archivo;color:#C82A1E;cursor:pointer;padding:6px 0;")}>‹ Voltar</button>
           <h2 style={S("margin:0;font:800 26px Archivo;color:#16181D;")}>Reabrir leitura</h2>
-          <p style={S("margin:0;font:400 15px/1.5 Archivo;color:#4C4F56;")}>Digite o código que você recebeu na tela de resultado e no e-mail.</p>
+          <p style={S("margin:0;font:400 15px/1.5 Archivo;color:#4C4F56;")}>O botão do e-mail abre sua leitura diretamente. Se preferir, cole aqui o código que faz parte do link recebido por e-mail.</p>
           <input value={reopen} onChange={(e) => { setReopen(e.target.value); setReopenErr(""); }} placeholder="Ex.: RC-XXXXXXXX-XXXXXXXX-XXXXXXXX" style={S("padding:16px;border:1px solid #D8D2C4;border-radius:12px;font:600 17px ui-monospace,monospace;background:#fff;color:#16181D;text-transform:uppercase;")} />
           {reopenErr && (
             <div style={S("background:#FBEDEC;border:1px solid #E4B4B1;border-radius:12px;padding:12px 14px;font:600 14px Archivo;color:#9A2B26;")}>{reopenErr}</div>
