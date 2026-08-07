@@ -52,6 +52,12 @@ export default function ParticipantPage() {
 
   const hydrated = useRef(false);
   const pollRef = useRef<any>(null);
+  // Espelho sempre atualizado das respostas — evita "closure velha" quando a
+  // última pergunta (single) dispara o envio automático via setTimeout.
+  const ansRef = useRef<any[]>(ans);
+  useEffect(() => {
+    ansRef.current = ans;
+  }, [ans]);
 
   // Recuperação de rascunho (localStorage) — igual ao protótipo
   useEffect(() => {
@@ -88,6 +94,7 @@ export default function ParticipantPage() {
     setAns((prev) => {
       const next = [...prev];
       next[i] = v;
+      ansRef.current = next;
       return next;
     });
   }
@@ -97,6 +104,7 @@ export default function ParticipantPage() {
     setAns((prev) => {
       const next = [...prev];
       next[i] = v;
+      ansRef.current = next;
       return next;
     });
     if (D.q[i].type !== "open") {
@@ -175,7 +183,10 @@ export default function ParticipantPage() {
 
   // ---- Gerar leitura (envio ao servidor) ----
   async function onGenerate() {
-    const first = ans.findIndex((a, i) => i < 15 && (a === undefined || a === null));
+    // Lê do ref (sempre atualizado) para não perder a última resposta quando o
+    // envio é disparado automaticamente logo após o setAns.
+    const current = ansRef.current;
+    const first = current.findIndex((a, i) => i < 15 && (a === undefined || a === null));
     if (first >= 0) {
       setQi(first);
       setScreen("quiz");
@@ -194,10 +205,10 @@ export default function ParticipantPage() {
       const payload = {
         form,
         ans: [
-          ...ans.slice(0, 15).map((v) => Number(v)),
-          ans[15] || "",
-          ans[16] || "",
-          ans[17] || "",
+          ...current.slice(0, 15).map((v) => Number(v)),
+          current[15] || "",
+          current[16] || "",
+          current[17] || "",
         ],
       };
       const res = await fetch("/api/submit", {
