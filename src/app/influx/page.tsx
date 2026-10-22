@@ -14,6 +14,7 @@ export default function InfluxPage(){
  const [step,setStep]=useState<"cadastro"|"questoes"|"resultado">("cadastro");
  const [idx,setIdx]=useState(0),[answers,setAnswers]=useState<number[]>(Array(9).fill(0));
  const [busy,setBusy]=useState(false),[error,setError]=useState(""),[code,setCode]=useState("");
+ const [marketing,setMarketing]=useState(false);
  const set=(k:keyof PerfilInflux,v:string|boolean)=>setForm(p=>({...p,[k]:v}));
  const begin=(e:React.FormEvent)=>{e.preventDefault();if(!form.consent){setError("Confirme seu consentimento.");return;}setError("");setStep("questoes");window.scrollTo(0,0)};
  const next=async()=>{
@@ -21,7 +22,7 @@ export default function InfluxPage(){
   if(idx<8){setIdx(i=>i+1);window.scrollTo(0,0);return;}
   setBusy(true);
   try{
-   const res=await fetch("/api/influx/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({form,ans:answers})});
+   const res=await fetch("/api/influx/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({form,ans:answers,marketing})});
    const data=await res.json();if(!res.ok)throw new Error(data.error||"Não foi possível salvar o resultado.");
    setCode(data.code);setStep("resultado");window.scrollTo(0,0);
   }catch(e:any){setError(e?.message||"Falha na conexão. Tente novamente.");}
@@ -58,8 +59,9 @@ export default function InfluxPage(){
      <Field label="Quantas pessoas atuam diretamente em vendas na sua operação? *"><select required style={inp} value={form.vend} onChange={e=>set("vend",e.target.value)}><option value="">Selecione uma faixa</option>{FAIXAS.map(x=><option key={x} value={x}>{x==="Não tenho equipe comercial"?x:x+" vendedores"}</option>)}</select></Field>
      <label style={{display:"flex",gap:10,fontSize:12,lineHeight:1.55,color:"#53626D",alignItems:"flex-start"}}>
       <input type="checkbox" required checked={form.consent} onChange={e=>set("consent",e.target.checked)} style={{marginTop:3,width:17,height:17,flexShrink:0}}/>
-      <span>Autorizo a VendaMais a tratar minhas informações para fornecer minha devolutiva e realizar contatos sobre soluções de desenvolvimento de lideranças, conforme a legislação de proteção de dados.</span>
+      <span>Autorizo a VendaMais a tratar minhas informações e respostas para produzir e enviar o resultado desta autoavaliação.</span>
      </label>
+     <label style={{display:"flex",gap:10,fontSize:12,lineHeight:1.55,color:"#53626D",alignItems:"flex-start"}}><input type="checkbox" checked={marketing} onChange={e=>setMarketing(e.target.checked)} style={{marginTop:3,width:17,height:17,flexShrink:0}}/><span>Também autorizo receber contato da VendaMais sobre programas de desenvolvimento e soluções comerciais (opcional).</span></label>
      {error&&<p role="alert" style={{margin:0,color:"#B6273D",fontWeight:700}}>{error}</p>}
      <button style={btn} type="submit">Começar avaliação →</button>
     </form>
