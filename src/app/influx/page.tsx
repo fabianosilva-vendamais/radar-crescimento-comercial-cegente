@@ -1,6 +1,6 @@
 "use client";
 import {useState} from "react";
-import {PERGUNTAS,ESCALA,EXEMPLOS,DIMENSOES,FAIXAS,type PerfilInflux} from "@/lib/influx";
+import {PERGUNTAS,ESCALA,EXEMPLOS,FAIXAS,type PerfilInflux} from "@/lib/influx";
 import {InfluxBrand} from "@/components/InfluxBrand";
 import {InfluxResultado} from "@/components/InfluxResultado";
 const estados=["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
@@ -41,7 +41,7 @@ export default function InfluxPage(){
    {step==="cadastro"&&<section style={box}>
     <div style={{fontWeight:900,color:"#102F55",letterSpacing:1.2,fontSize:12}}>EXPERIÊNCIA DE LIDERANÇA · INFLUX + VENDAMAIS</div>
     <h1 style={{fontSize:31,lineHeight:1.2,margin:"10px 0 14px"}}>Como está sua liderança hoje?</h1>
-    <p style={{fontSize:15,color:"#536C7F",lineHeight:1.55,marginBottom:25}}>Em poucos minutos, descubra como você percebe nove práticas essenciais de liderança. Ao final, receba recomendações específicas e um plano de ação para as próximas quatro semanas.</p>
+    <p style={{fontSize:15,color:"#536C7F",lineHeight:1.55,marginBottom:25}}>Em poucos minutos, descubra como você percebe nove práticas essenciais de liderança. Ao final, receba uma devolutiva objetiva com suas fortalezas, oportunidades de evolução e uma ação prática para começar.</p>
     <form onSubmit={begin} style={{display:"grid",gap:15}}>
      <Field label="Nome completo *"><input style={inp} required autoComplete="name" value={form.nome} onChange={e=>set("nome",e.target.value)}/></Field>
      <Field label="E-mail *"><input style={inp} type="email" required autoComplete="email" value={form.email} onChange={e=>set("email",e.target.value)}/></Field>
@@ -63,7 +63,6 @@ export default function InfluxPage(){
     </form>
    </section>}
    {step==="questoes"&&<section style={box}>
-    <div style={{color:"#102F55",fontWeight:900,fontSize:13,marginBottom:14}}>{DIMENSOES[Math.floor(idx/3)]}</div>
     <h1 style={{fontSize:23,lineHeight:1.4,margin:"0 0 25px"}}>{PERGUNTAS[idx]}</h1>
     <p style={{fontSize:13,color:"#536C7F",lineHeight:1.55,background:"#EFF4F7",padding:"11px 12px",borderRadius:10}}>Para ajudar a responder: {EXEMPLOS[idx]} Escolha o nível mais próximo da sua prática habitual.</p>
     <div style={{display:"grid",gap:10}}>
