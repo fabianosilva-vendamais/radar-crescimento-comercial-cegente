@@ -31,7 +31,7 @@ export async function POST(req:Request){
  const {data:part,error:pErr}=await db.from("participantes").insert({
   codigo:code,origem:ORIGEM_INFLUX,nome:p.nome,empresa:p.empresa,email:p.email,whats:p.whats,cidade:p.cidade,uf:p.uf,
   cargo:p.cargo,segmento:"Ensino de idiomas",vend:p.vend,unid:p.empresa,fat:"Não informado",
-  obstaculo:"",interesse:"",tema:"",consent:true,completed:true
+  obstaculo:"",interesse:input?.marketing===true?"Autorizou contato":"Sem autorização comercial",tema:"",consent:true,completed:true
  }).select("id,created_at").single();
  if(pErr||!part){console.error("influx_participante",pErr?.code);return bad("Não foi possível salvar os dados. Tente novamente.",500);}
  const maior=Math.max(...result.dims),menor=Math.min(...result.dims);
