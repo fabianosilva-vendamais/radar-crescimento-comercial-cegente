@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import {useParams} from "next/navigation";
-import {InfluxResultado} from "../../page";
+import {InfluxResultado} from "@/components/InfluxResultado";
 export default function RelatorioInflux(){
  const params=useParams(),[data,setData]=useState<{nome:string;ans:number[]}|null>(null),[erro,setErro]=useState("");
  const code=String(params?.codigo||"");
