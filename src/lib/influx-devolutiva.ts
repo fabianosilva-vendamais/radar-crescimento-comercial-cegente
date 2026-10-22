@@ -22,7 +22,13 @@ export function gerarDevolutiva(ans:number[]){
  const focoMaisAlto=r.items.filter(x=>x.nota===maior);
  const nivelDescricao=descricaoNivel(menor);
  const visaoGeral=todosIguais
-  ? "Você marcou "+(menor===1?"“Ainda não faço”":menor===2?"“Faço com ajuda”":menor===3?"“Já faço sozinho”":"“Faço com confiança”")+" nas nove afirmações. Como as respostas estão no mesmo nível, esta autoavaliação não permite apontar uma dimensão superior a outra. Ainda assim, ela pode servir para escolher comportamentos concretos e acompanhar a evolução."
+  ? menor===1
+   ? "Você indicou que ainda não coloca em prática as nove situações avaliadas. Em vez de tentar mudar tudo ao mesmo tempo, o melhor ponto de partida é criar hábitos simples de autogestão, desenvolvimento de pessoas e decisões comerciais. O roteiro abaixo traduz isso em três ações observáveis."
+   : menor===2
+    ? "Você assinalou “Faço com ajuda” nas nove situações. Seu próximo desafio é ganhar autonomia nas decisões, no acompanhamento da equipe e na análise do negócio. Comece praticando cada uma dessas frentes com compromissos verificáveis."
+    : menor===3
+     ? "Você assinalou “Já faço sozinho” nas nove situações. O próximo ganho pode vir de consistência: praticar também nas semanas difíceis, observar os resultados e pedir feedback sobre a forma como lidera."
+     : "Você relata autonomia e confiança nas nove práticas. Seu próximo passo é verificar se elas se sustentam sob pressão e se a equipe percebe os mesmos comportamentos, usando evidências e feedback."
   : dimIguais
    ? "As médias das três dimensões são iguais, mas suas respostas individuais variam. Por isso, a leitura mais útil está nos comportamentos específicos em que você percebe maior ou menor autonomia."
    : "Suas respostas mostram graus diferentes de autonomia entre práticas e dimensões. Isso não é uma nota de aprovação ou reprovação: ajuda a reconhecer o que já consegue fazer e a escolher um próximo comportamento observável para desenvolver.";
@@ -50,7 +56,7 @@ export function gerarDevolutiva(ans:number[]){
  if(todosIguais){
   tituloForca="O que este resultado permite concluir";
   textoForca=menor===1
-   ? "Você ainda não identifica essas nove práticas como parte da sua atuação. Não seria correto inventar uma fortaleza; o ganho agora é começar com uma ação simples em cada frente e observar o que muda."
+   ? "O padrão das respostas é transversal: a necessidade de desenvolvimento aparece na autogestão, na liderança da equipe e na gestão do negócio, não em uma competência isolada. A prioridade é construir uma rotina mínima em cada frente antes de ampliar a complexidade."
    : menor===4
     ? "Você demonstra confiança na própria atuação nas nove práticas. Como não há diferenças nas notas, não é possível eleger uma fortaleza isolada; vale validar sua percepção com exemplos, indicadores e feedback da equipe."
     : "As nove práticas receberam o mesmo nível. Não há evidência aqui para apontar uma fortaleza específica, mas há um caminho: praticar, registrar evidências e refazer a reflexão com mais exemplos concretos.";
@@ -62,7 +68,7 @@ export function gerarDevolutiva(ans:number[]){
  const oportunidade=todosIguais
   ? menor===4
    ? "Seu desafio é comprovar a consistência dessas práticas na realidade: peça a alguém da equipe um exemplo recente e compare com sua autopercepção."
-   : "Como nenhuma prática ficou abaixo das demais, escolhemos um ponto de partida em cada dimensão. Não se trata de dizer que são as únicas prioridades; é uma sequência prática para começar."
+   : "Seu ponto de partida sugerido é tornar três comportamentos visíveis: assumir e registrar um compromisso, desenvolver alguém da equipe com feedback e analisar um indicador antes de decidir. A sequência abaixo transforma essas intenções em ações concretas."
   : "Entre suas respostas, "+focoMaisBaixo[0].titulo.toLowerCase()+" recebeu "+menor+"/4. "+nivelDescricao+" "+focoMaisBaixo[0].porque;
 
  const periodos=["Dias 1 a 3","Dias 4 a 9","Dias 10 a 15"];
