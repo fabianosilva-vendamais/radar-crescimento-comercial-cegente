@@ -1,5 +1,5 @@
 import nodemailer, { type Transporter } from "nodemailer";
-import { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, EMAIL_FROM } from "./env";
+import { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } from "./env";
 
 /**
  * Envio de e-mail via Nodemailer + SMTP (Gmail).
@@ -52,7 +52,7 @@ export type SendResult = { ok: boolean; tries: number; error: string };
 
 async function sendOnce(to: string, subject: string, html: string): Promise<void> {
   const transporter = getTransporter();
-  await transporter.sendMail({ from: EMAIL_FROM, to, subject, html });
+  await transporter.sendMail({ from: "VendaMais <" + SMTP_USER + ">", to, subject, html });
 }
 
 /**
