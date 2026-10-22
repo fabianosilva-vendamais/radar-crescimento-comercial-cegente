@@ -33,7 +33,7 @@ export async function POST(req:Request){
   cargo:p.cargo,segmento:"Ensino de idiomas",vend:p.vend,unid:p.empresa,fat:"Não informado",
   obstaculo:"",interesse:input?.marketing===true?"Autorizou contato":"Sem autorização comercial",tema:"",consent:true,completed:true
  }).select("id,created_at").single();
- if(pErr||!part){console.error("influx_participante",pErr?.code);return bad("Não foi possível salvar os dados. Tente novamente.",500);}
+ if(pErr||!part){console.error("influx_participante",JSON.stringify({code:pErr?.code||null,message:pErr?.message||null,hint:pErr?.hint||null,hasPart:!!part}));return bad("Não foi possível salvar os dados. Tente novamente.",500);}
  const maior=Math.max(...result.dims),menor=Math.min(...result.dims);
  const fortes=result.dims.map((v,i)=>v===maior?DIMENSOES[i]:null).filter(Boolean).join(", ");
  const lacunas=result.dims.map((v,i)=>v===menor?DIMENSOES[i]:null).filter(Boolean).join(", ");
@@ -57,4 +57,11 @@ export async function POST(req:Request){
   }
  });
  return NextResponse.json({code});
+}
+
+export async function GET(){
+ const db=supabaseAdmin();
+ const {data,error}=await db.from("participantes").select("id").limit(1);
+ console.error("influx_db_health",JSON.stringify({errorCode:error?.code||null,errorMessage:error?.message||null,dataAvailable:Array.isArray(data)}));
+ return NextResponse.json({ready:!error,errorCode:error?.code||null,detail:error?.message||null},{headers:{"Cache-Control":"no-store"}});
 }
