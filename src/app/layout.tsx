@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Radar de Crescimento Comercial",
+  title: "Como está sua liderança hoje? | VendaMais • inFlux",
   description:
-    "Uma análise rápida para identificar os pontos que podem acelerar ou limitar o crescimento comercial da sua empresa. Evento VendaMais + Cegente · São José do Rio Preto.",
+    "Autodiagnóstico de liderança nas dimensões O Líder, O Líder da Equipe e O Líder do Negócio. Evento inFlux com metodologia VendaMais.",
 };
 
 export const viewport: Viewport = {
