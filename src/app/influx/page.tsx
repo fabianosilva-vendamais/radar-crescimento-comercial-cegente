@@ -1,6 +1,6 @@
 "use client";
 import {useState} from "react";
-import {PERGUNTAS,ESCALA,EXEMPLOS,DIMENSOES,FAIXAS,type PerfilInflux} from "@/lib/influx";
+import {PERGUNTAS,ESCALA,EXEMPLOS,FAIXAS,type PerfilInflux} from "@/lib/influx";
 import {InfluxBrand} from "@/components/InfluxBrand";
 import {InfluxResultado} from "@/components/InfluxResultado";
 const estados=["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
@@ -63,7 +63,6 @@ export default function InfluxPage(){
     </form>
    </section>}
    {step==="questoes"&&<section style={box}>
-    <div style={{color:"#102F55",fontWeight:900,fontSize:13,marginBottom:14}}>{DIMENSOES[Math.floor(idx/3)]}</div>
     <h1 style={{fontSize:23,lineHeight:1.4,margin:"0 0 25px"}}>{PERGUNTAS[idx]}</h1>
     <p style={{fontSize:13,color:"#536C7F",lineHeight:1.55,background:"#EFF4F7",padding:"11px 12px",borderRadius:10}}>Para ajudar a responder: {EXEMPLOS[idx]} Escolha o nível mais próximo da sua prática habitual.</p>
     <div style={{display:"grid",gap:10}}>
