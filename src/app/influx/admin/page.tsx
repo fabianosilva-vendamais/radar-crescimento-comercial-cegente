@@ -1,13 +1,10 @@
 "use client";
-import {useEffect,useState} from "react";
-import {supabaseBrowser,supabaseConfigured} from "@/lib/supabase-browser";
+import {useState} from "react";
 type R={id:string;created_at:string;nome:string;email:string;whats:string;cargo:string;empresa:string;cidade:string;uf:string;vend:string;prioridade:string;scoreFit:number;interesse:string;emailStatus:string;emailErro:string;dimensoes:number[];status:string};
 const inp:React.CSSProperties={padding:"11px 13px",border:"1px solid #D1D6DB",borderRadius:9,fontSize:15,boxSizing:"border-box",width:"100%"};
 const btn:React.CSSProperties={background:"#B6273D",color:"white",border:0,borderRadius:9,padding:"11px 17px",cursor:"pointer",fontWeight:800};
 export default function AdminInflux(){
- const [email,setEmail]=useState(""),[senha,setSenha]=useState(""),[token,setToken]=useState(""),[rows,setRows]=useState<R[]>([]),[erro,setErro]=useState(""),[load,setLoad]=useState(false),[filter,setFilter]=useState("Todos");
- useEffect(()=>{if(supabaseConfigured())supabaseBrowser().auth.getSession().then(({data})=>setToken(data.session?.access_token||""));},[]);
- useEffect(()=>{if(token)atualizar(token);},[token]);
+ const [senha,setSenha]=useState(""),[token,setToken]=useState(""),[rows,setRows]=useState<R[]>([]),[erro,setErro]=useState(""),[load,setLoad]=useState(false),[filter,setFilter]=useState("Todos");
  async function atualizar(t:string){
   setLoad(true);setErro("");
   try{const r=await fetch("/api/influx/admin",{headers:{Authorization:"Bearer "+t},cache:"no-store"});if(!r.ok)throw Error("Não autorizado ou indisponível.");const d=await r.json();setRows(d.records||[]);}
@@ -15,7 +12,7 @@ export default function AdminInflux(){
  }
  async function entrar(e:React.FormEvent){
   e.preventDefault();setErro("");setLoad(true);
-  try{const {data,error}=await supabaseBrowser().auth.signInWithPassword({email,password:senha});if(error||!data.session)throw Error(error?.message||"Não foi possível autenticar.");setToken(data.session.access_token);}
+  try{const r=await fetch("/api/influx/admin",{headers:{Authorization:"Bearer "+senha},cache:"no-store"});if(!r.ok)throw Error("Senha incorreta ou acesso indisponível.");const d=await r.json();setRows(d.records||[]);setToken(senha);setSenha("");}
   catch(e:any){setErro(e.message);}finally{setLoad(false);}
  }
  function exportar(){
@@ -26,14 +23,12 @@ export default function AdminInflux(){
   const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="radar-influx-participantes.csv";a.click();URL.revokeObjectURL(url);
  }
  const view=rows.filter(x=>filter==="Todos"||x.prioridade===filter);
- if(!supabaseConfigured())return <p>O acesso administrativo ainda não está configurado.</p>;
  return <main style={{minHeight:"100vh",background:"#F4F2ED",fontFamily:"Archivo,Arial,sans-serif",color:"#182832",padding:"25px 14px"}}>
   <div style={{maxWidth:1150,margin:"auto"}}>
    <h1 style={{fontSize:27,marginBottom:5}}>Radar Influx · Painel Comercial</h1>
    <p style={{color:"#586771",marginTop:0}}>Acesso restrito à VendaMais. Os perfis comerciais não alteram a devolutiva individual.</p>
    {!token?<form onSubmit={entrar} style={{maxWidth:400,background:"white",padding:25,borderRadius:16,display:"grid",gap:12,marginTop:25}}>
-    <label>E-mail administrador<input type="email" required style={inp} value={email} onChange={e=>setEmail(e.target.value)}/></label>
-    <label>Senha<input type="password" required style={inp} value={senha} onChange={e=>setSenha(e.target.value)}/></label>
+    <label>Senha administrativa<input type="password" required style={inp} value={senha} onChange={e=>setSenha(e.target.value)}/></label>
     <button style={btn} disabled={load}>Entrar</button>
    </form>:<>
     <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"center",margin:"23px 0"}}>
@@ -43,7 +38,7 @@ export default function AdminInflux(){
      </select>
      <button style={btn} onClick={exportar}>Exportar CSV</button>
      <button style={{...btn,background:"#385B70"}} onClick={()=>atualizar(token)} disabled={load}>Atualizar</button>
-     <button style={{...btn,background:"#727D84"}} onClick={async()=>{await supabaseBrowser().auth.signOut();setToken("");setRows([])}}>Sair</button>
+     <button style={{...btn,background:"#727D84"}} onClick={()=>{setToken("");setRows([])}}>Sair</button>
     </div>
     <div style={{overflowX:"auto",borderRadius:14,background:"white",border:"1px solid #E2E4E4"}}>
      <table style={{borderCollapse:"collapse",minWidth:950,width:"100%",fontSize:13}}>
