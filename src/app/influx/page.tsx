@@ -41,7 +41,7 @@ export default function InfluxPage(){
    {step==="cadastro"&&<section style={box}>
     <div style={{fontWeight:900,color:"#102F55",letterSpacing:1.2,fontSize:12}}>EXPERIÊNCIA DE LIDERANÇA · INFLUX + VENDAMAIS</div>
     <h1 style={{fontSize:31,lineHeight:1.2,margin:"10px 0 14px"}}>Como está sua liderança hoje?</h1>
-    <p style={{fontSize:15,color:"#536C7F",lineHeight:1.55,marginBottom:25}}>Em poucos minutos, descubra como você percebe nove práticas essenciais de liderança. Ao final, receba recomendações específicas e um plano de ação para as próximas quatro semanas.</p>
+    <p style={{fontSize:15,color:"#536C7F",lineHeight:1.55,marginBottom:25}}>Em poucos minutos, descubra como você percebe nove práticas essenciais de liderança. Ao final, receba uma devolutiva objetiva com suas fortalezas, oportunidades de evolução e uma ação prática para começar.</p>
     <form onSubmit={begin} style={{display:"grid",gap:15}}>
      <Field label="Nome completo *"><input style={inp} required autoComplete="name" value={form.nome} onChange={e=>set("nome",e.target.value)}/></Field>
      <Field label="E-mail *"><input style={inp} type="email" required autoComplete="email" value={form.email} onChange={e=>set("email",e.target.value)}/></Field>
