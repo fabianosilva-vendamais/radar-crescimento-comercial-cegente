@@ -1,50 +1,66 @@
 "use client";
-import {gerarLeitura,notaFormatada} from "@/lib/influx-report";
+import {gerarDevolutiva,notaFormatada} from "@/lib/influx-devolutiva";
 
-const C={azul:"#102F55",verde:"#BADA00",texto:"#19324D",muted:"#54677A",linha:"#E0E7EE"};
-const card:React.CSSProperties={background:"#fff",border:"1px solid #E2E9F0",borderRadius:18,padding:"21px 19px",boxShadow:"0 8px 30px rgba(12,46,84,.06)"};
+const C={azul:"#102F55",verde:"#BADA00",texto:"#19324D",muted:"#506578",linha:"#E0E7EE",base:"#F3F6F9"};
+const card:React.CSSProperties={background:"#fff",border:"1px solid #E2E9F0",borderRadius:18,padding:"23px 20px",boxShadow:"0 8px 30px rgba(12,46,84,.055)"};
+const h2:React.CSSProperties={fontSize:21,lineHeight:1.3,color:C.azul,margin:"0 0 13px"};
+const p:React.CSSProperties={fontSize:15,lineHeight:1.65,color:C.texto,margin:"8px 0 0"};
 
 export function InfluxResultado({nome,ans}:{nome:string;ans:number[]}){
- const r=gerarLeitura(ans);
+ const r=gerarDevolutiva(ans);
  const primeiroNome=nome.trim().split(" ")[0]||"Líder";
- const prioridade=r.prioridades[0];
- return <article style={{display:"grid",gap:15,fontFamily:"Archivo,Arial,sans-serif",color:C.texto}}>
-  <section style={{...card,background:C.azul,color:"white",border:"none",padding:"26px 22px"}}>
-   <div style={{fontSize:12,fontWeight:850,letterSpacing:1.25,color:C.verde}}>VENDAMAIS · DESENVOLVIMENTO DE LIDERANÇAS</div>
-   <h1 style={{fontSize:27,lineHeight:1.18,margin:"12px 0 10px",color:"white"}}>Seu Perfil de Liderança</h1>
-   <p style={{fontSize:15,lineHeight:1.6,margin:0,color:"#EDF4FC"}}>{primeiroNome}, suas respostas oferecem uma primeira visão de como você percebe sua atuação nas três dimensões da liderança.</p>
+ return <article style={{display:"grid",gap:17,fontFamily:"Archivo,Arial,sans-serif",color:C.texto}}>
+  <section style={{...card,background:C.azul,color:"white",border:"none",padding:"29px 24px"}}>
+   <div style={{fontSize:12,fontWeight:800,letterSpacing:1.2,color:C.verde}}>VENDAMAIS · DESENVOLVIMENTO DE LIDERANÇAS</div>
+   <h1 style={{fontSize:28,lineHeight:1.15,margin:"13px 0 11px",color:"white"}}>Seu Perfil de Liderança</h1>
+   <p style={{fontSize:15,lineHeight:1.6,margin:0,color:"#EEF4FA"}}>{primeiroNome}, este é um retrato inicial das práticas de liderança que você reconhece hoje — e de como pode transformá-las em ações.</p>
   </section>
   <section style={card}>
-   <h2 style={{fontSize:20,color:C.azul,margin:"0 0 7px"}}>Suas dimensões da liderança</h2>
-   <p style={{fontSize:13,lineHeight:1.5,color:C.muted,margin:"0 0 14px"}}>Média de cada dimensão, na escala de 1 a 4.</p>
-   {r.dimensoes.map((d,i)=><div key={d.nome} style={{padding:"12px 0",borderTop:i?"1px solid "+C.linha:"none"}}>
-    <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",fontSize:15,fontWeight:800,color:C.azul}}>
-     <span>{d.nome}</span><span style={{whiteSpace:"nowrap"}}>{notaFormatada(d.valor)} / 4</span>
+   <h2 style={h2}>O que suas respostas revelam</h2>
+   <p style={p}>{r.visaoGeral}</p>
+  </section>
+  <section style={card}>
+   <h2 style={h2}>Suas três dimensões de liderança</h2>
+   <p style={{fontSize:13,lineHeight:1.5,color:C.muted,margin:"0 0 15px"}}>Pontuação média de 1 a 4. Cada dimensão reúne três práticas da metodologia VendaMais.</p>
+   {r.dimensoes.map((d,i)=><div key={d.nome} style={{padding:"19px 0",borderTop:i?"1px solid "+C.linha:"none"}}>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,color:C.azul,fontWeight:850,fontSize:16}}>
+     <span>{d.nome}</span><span style={{whiteSpace:"nowrap"}}>{notaFormatada(d.nota)} / 4</span>
     </div>
-    <div role="meter" aria-label={d.nome} aria-valuemin={1} aria-valuemax={4} aria-valuenow={d.valor} style={{height:9,background:"#E8EEF3",borderRadius:9,marginTop:8,overflow:"hidden"}}>
-     <div style={{height:"100%",width:(d.valor/4*100)+"%",background:C.verde,borderRadius:9}}/>
+    <div role="meter" aria-label={d.nome} aria-valuemin={1} aria-valuemax={4} aria-valuenow={d.nota} style={{height:9,background:"#E8EEF3",borderRadius:9,margin:"11px 0",overflow:"hidden"}}>
+     <div style={{width:(d.nota/4*100)+"%",height:"100%",background:i===0?"#8C89C8":i===1?C.verde:"#477CA7",borderRadius:9}}/>
     </div>
+    <p style={{...p,fontSize:14,margin:"0"}}>{d.leitura}</p>
    </div>)}
   </section>
   <section style={card}>
-   <h2 style={{fontSize:19,color:C.azul,margin:"0 0 15px"}}>O que merece sua atenção</h2>
-   <div style={{borderLeft:"4px solid "+C.verde,paddingLeft:13,marginBottom:17}}>
-    <strong style={{color:C.azul,fontSize:15}}>Sua principal fortaleza</strong>
-    <p style={{fontSize:14,lineHeight:1.55,margin:"6px 0 0"}}>{r.resumoForte}</p>
+   <h2 style={h2}>A leitura para o seu desenvolvimento</h2>
+   <div style={{borderLeft:"4px solid "+C.verde,padding:"1px 0 3px 14px",marginBottom:19}}>
+    <h3 style={{fontSize:16,lineHeight:1.4,color:C.azul,margin:"0 0 7px"}}>{r.tituloForca}</h3>
+    <p style={{...p,fontSize:14,margin:0}}>{r.textoForca}</p>
    </div>
-   <div style={{borderLeft:"4px solid "+C.azul,paddingLeft:13}}>
-    <strong style={{color:C.azul,fontSize:15}}>Sua oportunidade de evolução</strong>
-    <p style={{fontSize:14,lineHeight:1.55,margin:"6px 0 0"}}>{r.resumoEvolucao}</p>
+   <div style={{borderLeft:"4px solid "+C.azul,padding:"1px 0 3px 14px"}}>
+    <h3 style={{fontSize:16,lineHeight:1.4,color:C.azul,margin:"0 0 7px"}}>Onde concentrar sua evolução</h3>
+    <p style={{...p,fontSize:14,margin:0}}>{r.oportunidade}</p>
    </div>
   </section>
-  <section style={{...card,background:"#F1F6E5",border:"1px solid #DCE8C1"}}>
-   <div style={{fontSize:11,fontWeight:850,letterSpacing:1,color:C.azul,marginBottom:8}}>SUA PRIMEIRA AÇÃO</div>
-   <h2 style={{fontSize:19,color:C.azul,margin:"0 0 10px"}}>{prioridade.titulo}</h2>
-   <p style={{fontSize:14,lineHeight:1.6,margin:0}}>{prioridade.acao}</p>
+  <section style={{...card,background:"#F6F9F0"}}>
+   <div style={{fontWeight:850,fontSize:11,letterSpacing:1.25,color:C.azul,marginBottom:10}}>TRANSFORME O RESULTADO EM PRÁTICA</div>
+   <h2 style={h2}>Seu roteiro para os próximos 15 dias</h2>
+   <p style={{...p,fontSize:14,marginBottom:8}}>Três movimentos possíveis, um em cada dimensão. A proposta é começar pequeno, testar na rotina e observar resultados — não tentar mudar tudo de uma vez.</p>
+   {r.plano.map((item,i)=><div key={item.dimensao} style={{borderTop:"1px solid #DFE6DB",padding:"17px 0 7px",display:"flex",gap:13}}>
+    <div style={{width:31,height:31,borderRadius:9,background:C.azul,color:"white",display:"flex",justifyContent:"center",alignItems:"center",fontWeight:900,flexShrink:0,fontSize:14}}>{i+1}</div>
+    <div>
+     <div style={{fontSize:12,fontWeight:850,color:"#506578"}}>{item.quando} · {item.dimensao}</div>
+     <h3 style={{fontSize:16,lineHeight:1.4,color:C.azul,margin:"5px 0 7px"}}>{item.titulo}</h3>
+     <p style={{...p,fontSize:14,margin:"0 0 9px"}}>{item.acao}</p>
+     <p style={{fontSize:13,lineHeight:1.5,color:C.muted,margin:"0"}}><b>Observe:</b> {item.indicador}</p>
+    </div>
+   </div>)}
   </section>
-  <section style={{textAlign:"center",padding:"3px 12px"}}>
-   <p style={{fontSize:13,fontWeight:750,color:C.azul,margin:"8px 0"}}>Sua liderança pode evoluir ainda mais com a VendaMais.</p>
-   <p style={{fontSize:12,lineHeight:1.6,color:C.muted,margin:"6px 0"}}>Este resultado reflete sua autopercepção em nove afirmações. É uma análise inicial, não uma avaliação completa de competências.</p>
+  <section style={{...card,background:"#EAF1F6"}}>
+   <h2 style={{...h2,fontSize:18}}>Como saber se você evoluiu?</h2>
+   <p style={{...p,fontSize:14}}>{r.desafioFinal}</p>
+   <p style={{fontSize:12,lineHeight:1.6,color:C.muted,margin:"17px 0 0"}}>{r.ressalva}</p>
   </section>
  </article>;
 }
