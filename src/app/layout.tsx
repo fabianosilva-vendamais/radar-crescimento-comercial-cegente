@@ -35,7 +35,7 @@ export default function RootLayout({
         style={{
           fontFamily: "'Archivo',system-ui,sans-serif",
           color: "#16181D",
-          background: "#F4F2ED",
+          background: "#F3F6F9",
         }}
       >
         {children}
