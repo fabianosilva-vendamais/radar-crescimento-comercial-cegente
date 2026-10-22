@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import {supabaseBrowser,supabaseConfigured} from "@/lib/supabase-browser";
-type R={id:string;created_at:string;nome:string;email:string;whats:string;cargo:string;empresa:string;cidade:string;uf:string;vend:string;prioridade:string;scoreFit:number;emailStatus:string;emailErro:string;dimensoes:number[];status:string};
+type R={id:string;created_at:string;nome:string;email:string;whats:string;cargo:string;empresa:string;cidade:string;uf:string;vend:string;prioridade:string;scoreFit:number;interesse:string;emailStatus:string;emailErro:string;dimensoes:number[];status:string};
 const inp:React.CSSProperties={padding:"11px 13px",border:"1px solid #D1D6DB",borderRadius:9,fontSize:15,boxSizing:"border-box",width:"100%"};
 const btn:React.CSSProperties={background:"#B6273D",color:"white",border:0,borderRadius:9,padding:"11px 17px",cursor:"pointer",fontWeight:800};
 export default function AdminInflux(){
@@ -20,7 +20,7 @@ export default function AdminInflux(){
  }
  function exportar(){
   const filtered=rows.filter(x=>filter==="Todos"||x.prioridade===filter);
-  const fields=["created_at","nome","email","whats","cargo","empresa","cidade","uf","vend","prioridade","scoreFit","emailStatus","status"];
+  const fields=["created_at","nome","email","whats","cargo","empresa","cidade","uf","vend","prioridade","scoreFit","interesse","emailStatus","status"];
   const cell=(v:unknown)=>'"'+String(v??"").replace(/"/g,'""')+'"';
   const csv="\uFEFF"+[fields.join(";"),...filtered.map(r=>fields.map(k=>cell((r as any)[k])).join(";"))].join("\r\n");
   const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="radar-influx-participantes.csv";a.click();URL.revokeObjectURL(url);
@@ -47,7 +47,7 @@ export default function AdminInflux(){
     </div>
     <div style={{overflowX:"auto",borderRadius:14,background:"white",border:"1px solid #E2E4E4"}}>
      <table style={{borderCollapse:"collapse",minWidth:950,width:"100%",fontSize:13}}>
-      <thead style={{background:"#14232E",color:"white"}}><tr>{["Participante","Cargo / unidade","Local","Equipe de vendas","Prioridade","3 dimensões (1–4)","E-mail"].map(x=><th key={x} style={{padding:12,textAlign:"left"}}>{x}</th>)}</tr></thead>
+      <thead style={{background:"#14232E",color:"white"}}><tr>{["Participante","Cargo / unidade","Local","Equipe de vendas","Prioridade","3 dimensões (1–4)","E-mail","Autorização comercial"].map(x=><th key={x} style={{padding:12,textAlign:"left"}}>{x}</th>)}</tr></thead>
       <tbody>{view.map(r=><tr key={r.id} style={{borderBottom:"1px solid #E7E7E7"}}>
        <td style={{padding:12}}><b>{r.nome}</b><div>{r.email}</div><div>{r.whats}</div></td>
        <td style={{padding:12}}><b>{r.cargo}</b><div>{r.empresa}</div></td>
@@ -55,7 +55,7 @@ export default function AdminInflux(){
        <td style={{padding:12}}>{r.vend}</td>
        <td style={{padding:12,fontWeight:800}}>{r.prioridade}</td>
        <td style={{padding:12}}>{r.dimensoes.map(x=>x.toFixed(1).replace(".",",")).join(" · ")}</td>
-       <td style={{padding:12}}>{r.emailStatus}</td>
+       <td style={{padding:12}}>{r.emailStatus}</td><td style={{padding:12}}>{r.interesse==="Autorizou contato"?"Sim":"Não"}</td>
       </tr>)}</tbody>
      </table>
     </div>
