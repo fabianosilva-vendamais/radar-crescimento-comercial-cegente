@@ -1,67 +1,55 @@
 import {NextResponse,after} from "next/server";
-import {supabaseAdmin} from "@/lib/supabase-server";
+import {influxDb} from "@/lib/influx-db";
 import {genReportCode} from "@/lib/code";
 import {queueSend} from "@/lib/mailer";
 import {emailInflux} from "@/lib/influx-email";
-import {FAIXAS,ORIGEM_INFLUX,avaliar,prioridadeComercial,DIMENSOES, type PerfilInflux} from "@/lib/influx";
-import {diaHora} from "@/lib/datetime";
+import {FAIXAS,avaliar,type PerfilInflux} from "@/lib/influx";
 export const runtime="nodejs";export const dynamic="force-dynamic";export const maxDuration=45;
-const emailRE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function bad(error:string,status=400){return NextResponse.json({error},{status});}
 export async function POST(req:Request){
  let input:any;
- try{input=await req.json()}catch{return bad("Requisição inválida.");}
+ try{input=await req.json();}catch{return bad("Requisição inválida.");}
  const raw=input?.form||{};
- const str=(v:unknown,max:number)=>String(v??"").trim().slice(0,max);
+ const str=(v:unknown,n:number)=>String(v??"").trim().slice(0,n);
  const p:PerfilInflux={
   nome:str(raw.nome,130),email:str(raw.email,220).toLowerCase(),whats:str(raw.whats,35),
   cargo:str(raw.cargo,130),empresa:str(raw.empresa,170),cidade:str(raw.cidade,130),
   uf:str(raw.uf,2).toUpperCase(),vend:str(raw.vend,60),consent:raw.consent===true
  };
  const ans=input?.ans;
- if(!p.nome||!p.cargo||!p.empresa||!p.cidade||!p.whats||!p.uf||!emailRE.test(p.email))return bad("Preencha todos os campos de identificação.");
- if(!/^[A-Z]{2}$/.test(p.uf))return bad("UF inválida.");
- if(!FAIXAS.some(x=>x===p.vend))return bad("Selecione uma faixa de equipe comercial.");
- if(!p.consent)return bad("É necessário autorizar o tratamento dos dados para participar.");
- let result:ReturnType<typeof avaliar>;
- try{result=avaliar(ans)}catch{return bad("Responda às nove afirmações com valores de 1 a 4.");}
- const {classe,fit}=prioridadeComercial(p.vend);
+ if(!p.nome||!p.cargo||!p.empresa||!p.cidade||p.whats.replace(/\D/g,"").length<7||!p.uf||!EMAIL_RE.test(p.email))return bad("Preencha todos os campos de identificação.");
+ if(!/^[A-Z]{2}$/.test(p.uf))return bad("Estado inválido.");
+ if(!FAIXAS.some(x=>x===p.vend))return bad("Selecione uma faixa de vendedores.");
+ if(!p.consent)return bad("É necessário consentimento para receber o resultado.");
+ try{avaliar(ans)}catch{return bad("Responda às nove afirmações na escala de 1 a 4.");}
  const code=genReportCode().replace(/^RC-/,"LI-");
- const db=supabaseAdmin();
- const {data:part,error:pErr}=await db.from("participantes").insert({
-  codigo:code,origem:ORIGEM_INFLUX,nome:p.nome,empresa:p.empresa,email:p.email,whats:p.whats,cidade:p.cidade,uf:p.uf,
-  cargo:p.cargo,segmento:"Ensino de idiomas",vend:p.vend,unid:p.empresa,fat:"Não informado",
-  obstaculo:"",interesse:input?.marketing===true?"Autorizou contato":"Sem autorização comercial",tema:"",consent:true,completed:true
- }).select("id,created_at").single();
- if(pErr||!part){console.error("influx_participante",JSON.stringify({code:pErr?.code||null,message:pErr?.message||null,hint:pErr?.hint||null,hasPart:!!part}));return bad("Não foi possível salvar os dados. Tente novamente.",500);}
- const maior=Math.max(...result.dims),menor=Math.min(...result.dims);
- const fortes=result.dims.map((v,i)=>v===maior?DIMENSOES[i]:null).filter(Boolean).join(", ");
- const lacunas=result.dims.map((v,i)=>v===menor?DIMENSOES[i]:null).filter(Boolean).join(", ");
- const [{error:aErr},{error:rErr},{error:mErr},{error:cErr}]=await Promise.all([
-  db.from("respostas").insert({participante_id:part.id,valores:ans}),
-  db.from("resultados").insert({participante_id:part.id,overall:Math.round(result.total*10),classificacao:"Autopercepção de liderança",
-   dim1:Math.round(result.dims[0]*10),dim2:Math.round(result.dims[1]*10),dim3:Math.round(result.dims[2]*10),
-   dim4:null,dim5:null,forte:fortes,gargalo:lacunas,lead_classe:classe,lead_fit:fit}),
-  db.from("emails").insert({participante_id:part.id,status:"fila",tries:0,last_date:"—",last_err:""}),
-  db.from("acompanhamento").insert({participante_id:part.id,status_comercial:"Novo",contatado:false,observacao:""})
- ]);
- if(aErr||rErr||mErr||cErr){console.error("influx_save",aErr?.code,rErr?.code,mErr?.code,cErr?.code);return bad("O cadastro foi registrado, mas ocorreu uma falha na finalização. Solicite suporte.",500);}
+ let db:ReturnType<typeof influxDb>;
+ try{db=influxDb();}catch{return bad("Armazenamento temporariamente indisponível.",503);}
+ const {error}=await db.rpc("influx_registrar",{
+  p_codigo:code,
+  p_respostas:ans,
+  p_dados:{...p,autoriza_contato:input?.marketing===true}
+ });
+ if(error){console.error("influx_registrar",JSON.stringify({code:error.code,message:error.message}));return bad("Falha ao registrar o resultado. Tente novamente.",503);}
  after(async()=>{
-  const {dia,hora}=diaHora(part.created_at);
+  let status="erro",tries=0,err="";
   try{
    const url=new URL(req.url).origin+"/influx/r/"+encodeURIComponent(code);
    const send=await queueSend(p.email,"Seu Perfil de Liderança | VendaMais • inFlux",emailInflux(p.nome,ans,url));
-   await db.from("emails").update({status:send.ok?"enviado":"erro",tries:send.tries,last_date:dia+" "+hora,last_err:send.error,updated_at:new Date().toISOString()}).eq("participante_id",part.id);
-  }catch(e:any){
-   await db.from("emails").update({status:"erro",last_err:String(e?.message||"Falha SMTP").slice(0,400),updated_at:new Date().toISOString()}).eq("participante_id",part.id);
+   status=send.ok?"enviado":"erro";tries=send.tries;err=send.error;
+  }catch(e:any){err=String(e?.message||"Falha no envio").slice(0,300);}
+  const secret=process.env.INFLUX_ADMIN_SECRET;
+  if(secret){
+   try{const result=await db.rpc("influx_email_status",{p_codigo:code,p_secret:secret,p_status:status,p_tries:tries,p_error:err});
+    if(result.error)console.error("influx_email_status",result.error.code);
+   }catch(e:any){console.error("influx_email_status_unavailable",String(e?.message||"Erro"));}
   }
  });
  return NextResponse.json({code});
 }
-
 export async function GET(){
- const db=supabaseAdmin();
- const {data,error}=await db.from("participantes").select("id").limit(1);
- console.error("influx_db_health",JSON.stringify({errorCode:error?.code||null,errorMessage:error?.message||null,dataAvailable:Array.isArray(data)}));
- return NextResponse.json({ready:!error,errorCode:error?.code||null,detail:error?.message||null},{headers:{"Cache-Control":"no-store"}});
+ const db=influxDb();
+ const {error}=await db.rpc("influx_relatorio",{p_codigo:"LI-TESTE-NAO-EXISTE"});
+ return NextResponse.json({ready:!error,code:error?.code||null},{headers:{"Cache-Control":"no-store"}});
 }
