@@ -1,6 +1,6 @@
 "use client";
 import {useState} from "react";
-type R={id:string;created_at:string;nome:string;email:string;whats:string;cargo:string;empresa:string;cidade:string;uf:string;vend:string;prioridade:string;scoreFit:number;interesse:string;emailStatus:string;emailErro:string;dimensoes:number[];status:string};
+type R={id:string;created_at:string;nome:string;email:string;whats:string;cargo:string;empresa:string;cidade:string;uf:string;vend:string;prioridade:string;scoreFit:number;interesse:string;emailStatus:string;emailErro:string;dimensoes:number[];respostas:number[];status:string};
 const inp:React.CSSProperties={padding:"11px 13px",border:"1px solid #D1D6DB",borderRadius:9,fontSize:15,boxSizing:"border-box",width:"100%"};
 const btn:React.CSSProperties={background:"#102F55",color:"#fff",border:0,borderRadius:9,padding:"11px 17px",cursor:"pointer",fontWeight:800};
 export default function AdminInflux(){
@@ -17,10 +17,21 @@ export default function AdminInflux(){
  }
  function exportar(){
   const filtered=rows.filter(x=>filter==="Todos"||x.prioridade===filter);
-  const fields=["created_at","nome","email","whats","cargo","empresa","cidade","uf","vend","prioridade","scoreFit","interesse","emailStatus","status"];
-  const cell=(v:unknown)=>'"'+String(v??"").replace(/"/g,'""')+'"';
-  const csv="\uFEFF"+[fields.join(";"),...filtered.map(r=>fields.map(k=>cell((r as any)[k])).join(";"))].join("\r\n");
-  const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="radar-influx-participantes.csv";a.click();URL.revokeObjectURL(url);
+  const fields=["Data e hora","Nome","E-mail","WhatsApp","Cargo","Empresa/unidade","Cidade","UF","Faixa de vendedores","Qualificação comercial","Pontuação de aderência","Autorização comercial","Status de envio do e-mail","Situação comercial","Nota — O Líder","Nota — O Líder da Equipe","Nota — O Líder do Negócio",...Array.from({length:9},(_,i)=>"Resposta "+(i+1))];
+  const safe=(v:unknown)=>{
+    const raw=String(v??"");
+    // Evita a execução de fórmulas se a planilha for aberta no Excel.
+    const value=/^[=+@\-\t\r]/.test(raw)?"'"+raw:raw;
+    return '"'+value.replace(/"/g,'""')+'"';
+  };
+  const csv="\uFEFF"+[fields.map(safe).join(";"),...filtered.map(r=>{
+    const values=[r.created_at,r.nome,r.email,r.whats,r.cargo,r.empresa,r.cidade,r.uf,r.vend,r.prioridade,r.scoreFit,r.interesse==="Autorizou contato"?"Sim":"Não",r.emailStatus,r.status,
+      ...(r.dimensoes||[]).map(n=>typeof n==="number"?n.toFixed(2).replace(".",","):""),
+      ...Array.from({length:9},(_,i)=>r.respostas?.[i]??"")];
+    return values.map(safe).join(";");
+  })].join("\r\n");
+  const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  const a=document.createElement("a");a.href=url;a.download="radar-influx-dados-completos.csv";a.click();URL.revokeObjectURL(url);
  }
  const view=rows.filter(x=>filter==="Todos"||x.prioridade===filter);
  return <main style={{minHeight:"100vh",background:"#F3F6F9",fontFamily:"Archivo,Arial,sans-serif",color:"#182832",padding:"25px 14px"}}>
