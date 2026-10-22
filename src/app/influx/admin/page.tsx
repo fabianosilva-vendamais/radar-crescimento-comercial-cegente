@@ -2,7 +2,7 @@
 import {useState} from "react";
 type R={id:string;created_at:string;nome:string;email:string;whats:string;cargo:string;empresa:string;cidade:string;uf:string;vend:string;prioridade:string;scoreFit:number;interesse:string;emailStatus:string;emailErro:string;dimensoes:number[];status:string};
 const inp:React.CSSProperties={padding:"11px 13px",border:"1px solid #D1D6DB",borderRadius:9,fontSize:15,boxSizing:"border-box",width:"100%"};
-const btn:React.CSSProperties={background:"#B6273D",color:"white",border:0,borderRadius:9,padding:"11px 17px",cursor:"pointer",fontWeight:800};
+const btn:React.CSSProperties={background:"#102F55",color:"#fff",border:0,borderRadius:9,padding:"11px 17px",cursor:"pointer",fontWeight:800};
 export default function AdminInflux(){
  const [senha,setSenha]=useState(""),[token,setToken]=useState(""),[rows,setRows]=useState<R[]>([]),[erro,setErro]=useState(""),[load,setLoad]=useState(false),[filter,setFilter]=useState("Todos");
  async function atualizar(t:string){
@@ -23,7 +23,7 @@ export default function AdminInflux(){
   const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="radar-influx-participantes.csv";a.click();URL.revokeObjectURL(url);
  }
  const view=rows.filter(x=>filter==="Todos"||x.prioridade===filter);
- return <main style={{minHeight:"100vh",background:"#F4F2ED",fontFamily:"Archivo,Arial,sans-serif",color:"#182832",padding:"25px 14px"}}>
+ return <main style={{minHeight:"100vh",background:"#F3F6F9",fontFamily:"Archivo,Arial,sans-serif",color:"#182832",padding:"25px 14px"}}>
   <div style={{maxWidth:1150,margin:"auto"}}>
    <h1 style={{fontSize:27,marginBottom:5}}>Radar Influx · Painel Comercial</h1>
    <p style={{color:"#586771",marginTop:0}}>Acesso restrito à VendaMais. Os perfis comerciais não alteram a devolutiva individual.</p>
@@ -37,12 +37,12 @@ export default function AdminInflux(){
       {["Todos","Prioritário","Acompanhar","Nutrição"].map(x=><option key={x}>{x}</option>)}
      </select>
      <button style={btn} onClick={exportar}>Exportar CSV</button>
-     <button style={{...btn,background:"#385B70"}} onClick={()=>atualizar(token)} disabled={load}>Atualizar</button>
+     <button style={{...btn,background:"#7AAB00"}} onClick={()=>atualizar(token)} disabled={load}>Atualizar</button>
      <button style={{...btn,background:"#727D84"}} onClick={()=>{setToken("");setRows([])}}>Sair</button>
     </div>
     <div style={{overflowX:"auto",borderRadius:14,background:"white",border:"1px solid #E2E4E4"}}>
      <table style={{borderCollapse:"collapse",minWidth:950,width:"100%",fontSize:13}}>
-      <thead style={{background:"#14232E",color:"white"}}><tr>{["Participante","Cargo / unidade","Local","Equipe de vendas","Prioridade","3 dimensões (1–4)","E-mail","Autorização comercial"].map(x=><th key={x} style={{padding:12,textAlign:"left"}}>{x}</th>)}</tr></thead>
+      <thead style={{background:"#102F55",color:"white"}}><tr>{["Participante","Cargo / unidade","Local","Equipe de vendas","Prioridade","3 dimensões (1–4)","E-mail","Autorização comercial"].map(x=><th key={x} style={{padding:12,textAlign:"left"}}>{x}</th>)}</tr></thead>
       <tbody>{view.map(r=><tr key={r.id} style={{borderBottom:"1px solid #E7E7E7"}}>
        <td style={{padding:12}}><b>{r.nome}</b><div>{r.email}</div><div>{r.whats}</div></td>
        <td style={{padding:12}}><b>{r.cargo}</b><div>{r.empresa}</div></td>
@@ -55,7 +55,7 @@ export default function AdminInflux(){
      </table>
     </div>
    </>}
-   {erro&&<p role="alert" style={{color:"#B6273D",fontWeight:800}}>{erro}</p>}
+   {erro&&<p role="alert" style={{color:"#102F55",fontWeight:800}}>{erro}</p>}
   </div>
  </main>;
 }
